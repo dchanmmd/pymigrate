@@ -1,0 +1,42 @@
+{% set checkgroup = 'row-ids' %}
+
+{% for item in inventory %}
+<tr class="group">
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <input id="{{ item['barcode'] }}" type="checkbox" name="{{checkgroup}}" value="{{ item['barcode'] }}">
+    </td>
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <button type="button" aria-label="Abrir detalle del producto" data-id="{{ item['barcode'] }}"
+            onclick="openDetails(this)" class="text-blue-700 hover:underline cursor-pointer">
+            {{ item['barcode'] }}
+        </button>
+    </td>
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <p class="line-clamp-1">{{ item['name'] }}</p>
+    </td>
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <p class="line-clamp-1">
+            {{ item['weight'] }}
+            <span class="text-xs font-bold opacity-60">kg</span>
+        </p>
+    </td>
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <p class="line-clamp-1">
+            <span class="font-bold opacity-60">$</span>
+            {{ item['rp'] }}
+        </p>
+    </td>
+    <td class="group-not-last:border-b border-neutral-300 p-2">
+        <p class="line-clamp-1">
+            <span class="font-bold opacity-60">$</span>
+            {{ item['cost'] }}
+        </p>
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="9999" class="p-2">
+        <p class="w-full text-center opacity-60">No se encontraron resultados.</p>
+    </td>
+</tr>
+{% endfor %}

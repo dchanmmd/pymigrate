@@ -1,0 +1,110 @@
+{% extends layout('base.html') %}
+{% set title = 'Inventario de la Sucursal' %}
+{% set transfer_form = 'transfer-form' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% include partial('_header.html') %}
+<main class="p-4 w-full max-w-7xl mx-auto space-y-8">
+    <dialog id="row-details"
+        class="relative open:block p-4 rounded-lg mx-auto my-auto overflow-hidden min-w-lg backdrop:h-screen backdrop:brightness-50 backdrop:backdrop-blur-xs space-y-6">
+        <button id="close-dialog-btn" aria-label="Cerrar diálogo" class="absolute top-4 right-4 cursor-pointer">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <h2 class="text-xl font-bold">Detalles del producto</h2>
+        <div id="dialog-content" class="flex w-full justify-center">
+            <img src="{{request.url_for('public', path='/img/spinner.svg')}}" height="32" width="32"
+                alt="loading spinner">
+        </div>
+    </dialog>
+    <h1 class="text-2xl font-semibold">{{ title }}</h1>
+    <div class="space-y-4">
+        <!-- BEGIN utility bar -->
+        <div class="flex w-full justify-between">
+            <!-- BEGIN search bar -->
+            <div
+                class="flex items-center gap-2 border border-neutral-300 rounded-lg px-2 py-1 text-lg w-full max-w-md outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
+                <i class="bi bi-search opacity-60"></i>
+                <input id="search-bar" type="search" class="flex-1 focus:outline-none"
+                    placeholder="Buscar por nombre, SKU o código...">
+                <button type="button" id="clear-search" aria-label="Borrar barra de búsqueda" class="cursor-pointer">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- END search bar -->
+
+            <div class="flex gap-4">
+                <!-- BEGIN refresh button -->
+                <button type="button" id="refresh-results" aria-label="Refrescar tabla"
+                    class="flex justify-center items-center rounded-full aspect-square p-2 border border-neutral-300 cursor-pointer">
+                    <i class="bi bi-arrow-clockwise px-0.5"></i>
+                </button>
+                <!-- END refresh button -->
+                <!-- BEGIN send button -->
+                <button id="submit-transfer"
+                    class="px-4 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-200 disabled:text-neutral-600 duration-150 cursor-pointer">
+                    Transferir
+                </button>
+                <!-- END send button -->
+            </div>
+        </div>
+        <!-- END utility bar -->
+
+        <form id="{{ transfer_form }}" method="post" class="contents">
+            <!-- BEGIN table -->
+            <div class="overflow-x-auto">
+                <table class="w-full rounded-lg border border-neutral-300 border-separate border-spacing-0">
+                    <thead>
+                        <tr class="group">
+                            <th class="border-b border-neutral-300 text-left p-2">
+                                <input id="select-all" type="checkbox">
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Código de barra
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Nombre
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Peso
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Precio de Venta
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Coste
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        {% include partial('_inv-rows.html') %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- END table -->
+        </form>
+        <!-- BEGIN pagination bar -->
+        <div class="w-full flex justify-between py-2">
+            <div>
+                <p class="text-xs opacity-60">Mostrando {{start}}-{{end}} de {{count}} resultados</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="previous-btn" type="button" aria-label="Mostrar previa página"
+                    class="rounded-lg p-2 border border-neutral-300 cursor-pointer">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button id="next-btn" type="button" aria-label="Mostrar siguiente página"
+                    class="rounded-lg p-2 border border-neutral-300 cursor-pointer">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        <!-- END pagination bar -->
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.url_for('public', path='/js/branchInventory.js') }}"></script>
+{% endblock %}

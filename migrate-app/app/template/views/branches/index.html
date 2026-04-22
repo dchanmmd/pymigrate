@@ -1,0 +1,19 @@
+{% from partial('_branch-card.html') import branch_card %}
+{% extends layout('base.html') %}
+
+{% block content %}
+{% include partial('_header.html') %}
+<main class="p-4 w-full max-w-7xl mx-auto space-y-8">
+    <h1 class="text-2xl text-center font-bold">Seleccionar sucursal</h1>
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+        {% for branch in branches %}
+        {{ branch_card(request, id=branch['id'], name=branch['name']) }}
+        {% else %}
+        <p class="col-span-4 text-center opacity-60">Hubo un error al buscar las sucursales.</p>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
