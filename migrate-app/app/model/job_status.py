@@ -1,7 +1,6 @@
-from sqlmodel import Enum
+from enum import Enum
 
 class JobStatus(str, Enum):
-    Pending = 'pending'
-    Processing = 'processing'
-    Success = 'success'
-    Failure = 'failure'
+    Pending = 'pendiente'
+    Processing = 'en proceso'
+    Completed = 'completado'

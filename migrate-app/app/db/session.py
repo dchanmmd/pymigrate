@@ -1,23 +1,26 @@
+from app.db.metadata import pg_metadata
+from app.config.settings import get_settings
 from typing import Annotated
 from fastapi import Depends
 from sqlmodel import SQLModel, Session, create_engine
-import os
 
-db_driver = os.getenv('DB_DRIVER')
-db_host = os.getenv('DB_HOST')
-db_port = os.getenv('DB_PORT')
-db_user = os.getenv('DB_USER')
-db_password = os.getenv('DB_PASSWORD')
-db_name = os.getenv('DB_NAME')
+settings = get_settings()
 
-url = f"{db_driver}://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-engine = create_engine(url=url)
+pg_engine = create_engine(url=settings.pg_url)
 
-def create_db():
-    SQLModel.metadata.create_all(engine)
+def create_pg():
+    pg_metadata.create_all(pg_engine)
 
-def get_session():
-    with Session(engine) as session:
+def get_pg_session():
+    with Session(pg_engine) as session:
         yield session
 
-RequiresSession = Annotated[Session, Depends(get_session)]
+RequiresPostgres = Annotated[Session, Depends(get_pg_session)]
+
+rds_engine = create_engine(url=settings.rds_url)
+
+def get_rds_session():
+    with Session(rds_engine) as session:
+        yield session
+
+RequiresRDS = Annotated[Session, Depends(get_rds_session)]

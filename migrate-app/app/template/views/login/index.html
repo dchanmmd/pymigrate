@@ -1,0 +1,49 @@
+{% extends layout('base.html') %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div id="alert" role="alert" class="invisible absolute top-4 right-4 min-w-lg max-w-2xl bg-red-200 border border-red-900 gap-2 p-2 flex items-center">
+    <p id="alert-content" class="flex-1"></p>
+    <button id="close-alert" aria-label="Cerrar alerta" class="cursor-pointer">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+<main class="w-full h-screen overflow-hidden flex justify-center items-center bg-amber-50">
+    <form id="login" class="contents">
+        <div class="rounded-lg shadow-sm bg-white shadow-stone-400 p-8 space-y-12 w-full mx-auto max-w-lg">
+            <div class="space-y-2">
+                <h1 class="text-2xl font-bold">Inicia Sesión</h1>
+                <p class="opacity-60">Utiliza tus credenciales de MMD Pawn para acceder al inventario.</p>
+            </div>
+            <div class="space-y-8">
+                <div class="space-y-2">
+                    <label for="username" class="block text-xs uppercase font-bold">Usuario</label>
+                    <div
+                        class="flex items-center gap-2 px-2 py-1 rounded border border-neutral-300 bg-neutral-100 outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
+                        <input type="text" name="username" id="username" class="flex-1 focus:outline-none">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label for="password" class="block text-xs uppercase font-bold">Clave (contraseña)</label>
+                    <div
+                        class="flex items-center gap-2 px-2 py-1 rounded border border-neutral-300 bg-neutral-100 outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
+                        <input type="text" name="password" id="password" class="flex-1 focus:outline-none">
+                        <button type="button" id="toggle-password" aria-label="Cambiar visibilidad de la contraseña" class="cursor-pointer">
+                            <i class="bi bi-eye-slash-fill text-neutral-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="submit" value="Iniciar sesión"
+                    class="w-full py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 duration-150 cursor-pointer">
+            </div>
+        </div>
+    </form>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{request.url_for('public', path='/js/login.js')}}"></script>
+{% endblock %}

@@ -3,6 +3,7 @@ annotated-types==0.7.0
 anyio==4.13.0
 click==8.3.2
 fastapi==0.136.0
+fastapi-tailwind==2.0.4a1
 greenlet==3.4.0
 h11==0.16.0
 idna==3.11
@@ -11,7 +12,9 @@ MarkupSafe==3.0.3
 psycopg==3.3.3
 psycopg-binary==3.3.3
 pydantic==2.13.3
+pydantic-settings==2.14.0
 pydantic_core==2.46.3
+PyMySQL==1.1.2
 python-dotenv==1.2.2
 python-multipart==0.0.26
 SQLAlchemy==2.0.49

@@ -8,11 +8,9 @@ i.bi {
     align-items: center;
 }
 
-
-@utility interpolate-keywords {
-    interpolate-size: allow-keywords;
+.clip-trapezoid {
+    clip-path: polygon(0 0, 100% 0, 60% 100%, 0% 100%);
 }
-
 
 .spin {
     animation: spin 500ms ease-out forwards infinite;

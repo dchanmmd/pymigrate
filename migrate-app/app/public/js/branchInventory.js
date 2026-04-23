@@ -41,10 +41,11 @@ const selectAll = document.getElementById('select-all');
 
 let page = null;
 let query = null;
+let last = false;
 
 const updateSearchParams = () => {
     const params = new URLSearchParams(window.location.search);
-    page = parseInt(params.get('page') ?? 0);
+    page = parseInt(params.get('page') ?? 1);
     query = params.get('query');
 };
 
@@ -52,6 +53,8 @@ const updateSearchParams = () => {
 window.addEventListener('DOMContentLoaded', () => {
     // Transfer button is disabled if no rows are selected
     submitTransferButton.disabled = !rowIds.size;
+    // Previous page button is disabled if page is 1 or less
+    previousPageButton.disabled = page <= 1;
 });
 
 // Text clear implementation
@@ -64,7 +67,7 @@ clearSearchButton.addEventListener('click', clearSearch);
 
 // Text search implementation
 const searchText = async () => {
-    const query = encodeURIComponent(searchBar.value);
+    query = searchBar.value;
     const params = { query };
     if (page) params['page'] = page;
     const rows = await getTableUpdate(params);
@@ -81,8 +84,10 @@ searchBar.addEventListener('keydown', (event) => {
 
 // Table refresh implementation
 const refreshTable = async () => {
+    const lastContent = tableBody.innerHTML;
+    tableBody.innerHTML = '';
     const rows = await getTableUpdate({ page, query });
-    if (tableBody) tableBody.innerHTML = rows;
+    if (tableBody) tableBody.innerHTML = rows ?? lastContent;
 }
 
 // Refresh table on Enter
@@ -99,7 +104,7 @@ refreshButton.addEventListener('click', () => {
 // Show modal dialog implementation
 /** @param {HTMLButtonElement} button */
 const openDetails = async (button) => {
-    const itemId = button.dataset["id"];
+    const itemId = button.dataset['id'];
     const details = await getItemDetails(itemId);
     if (dialog && dialogContent) {
         dialogContent.innerHTML = details;
@@ -141,6 +146,7 @@ tableBody.addEventListener('change', (event) => {
     }
 
     if (selectAll) selectAll.checked = Array.from(checkboxes).every(c => c.checked);
+    if (submitTransferButton) submitTransferButton.disabled = !rowIds.size;
 });
 
 // Select all implementation
@@ -150,10 +156,34 @@ const selectAllControlsAll = () => {
         c.checked = selectAll.checked;
         selectAll.checked ? rowIds.add(c.value) : rowIds.delete(c.value);
     });
+
+    if (submitTransferButton) submitTransferButton.disabled = !rowIds.size;
 };
 
 // Update selection on 'select all' check
 selectAll.addEventListener('change', selectAllControlsAll);
+
+// Load previous page implementation
+const previousPage = async () => {
+    page = Math.max(page - 1, 0);
+    console.log({ page });
+    const rows = await getTableUpdate({ page, query });
+    if (tableBody) tableBody.innerHTML = rows;
+}
+
+// Load next page on '>' button click
+previousPageButton.addEventListener('click', previousPage);
+
+// Load next page implementation
+const nextPage = async () => {
+    if (!page) page = 1;
+    page++;
+    const rows = await getTableUpdate({ page, query });
+    if (tableBody) tableBody.innerHTML = rows;
+}
+
+// Load next page on '>' button click
+nextPageButton.addEventListener('click', nextPage);
 
 /**
  * Request a re-render of the table as HTML.
@@ -164,7 +194,7 @@ const getTableUpdate = async ({ page, query } = {}) => {
     const branchId = window.location.pathname.split('/').filter(Boolean)[1];
     const url = new URL(`/api/v1/inventory/${branchId}/rows`, window.location.origin);
 
-    if (page) url.searchParams.set('query', page);
+    if (page) url.searchParams.set('page', page);
     if (query) url.searchParams.set('query', query);
 
     const response = await fetch(url, {
@@ -172,6 +202,8 @@ const getTableUpdate = async ({ page, query } = {}) => {
     });
 
     if (response.ok) {
+        previousPageButton.disabled = page <= 1;
+        nextPageButton.disabled = response.headers.get('X-Is-Last-Page')?.trim() === 'true';
         return await response.text();
     }
 };
@@ -185,7 +217,7 @@ const getItemDetails = async (itemId) => {
     const branchId = window.location.pathname.split('/').filter(Boolean)[1];
     const url = new URL(`/api/v1/inventory/${branchId}/rows/${itemId}`, window.location.origin);
 
-    if (page) url.searchParams.set('query', page);
+    if (page) url.searchParams.set('page', page);
     if (query) url.searchParams.set('query', query);
 
     const response = await fetch(url, {
