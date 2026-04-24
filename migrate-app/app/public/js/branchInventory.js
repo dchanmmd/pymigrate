@@ -37,7 +37,17 @@ const transferForm = document.getElementById('transfer-form');
 /** @type {HTMLInputElement} */
 const selectAll = document.getElementById('select-all');
 
+/** @type {HTMLDialogElement} */
+const confirmDialog = document.getElementById('transfer-confirm-modal');
 
+/** @type {HTMLUListElement} */
+const transferSummary = document.getElementById('transfer-summary');
+
+/** @type {HTMLButtonELement} */
+const confirmTransferButton = document.getElementById('confirm-transfer-btn');
+
+/** @type {HTMLButtonELement} */
+const cancelTransferButton = document.getElementById('cancel-transfer-btn');
 
 let page = null;
 let query = null;
@@ -52,7 +62,7 @@ const updateSearchParams = () => {
 // Set page's initial state
 window.addEventListener('DOMContentLoaded', () => {
     // Transfer button is disabled if no rows are selected
-    submitTransferButton.disabled = !rowIds.size;
+    submitTransferButton.disabled = !document.querySelectorAll('input[type="checkbox"][name="row-ids"]:checked').length;
     // Previous page button is disabled if page is 1 or less
     previousPageButton.disabled = page <= 1;
 });
@@ -72,6 +82,7 @@ const searchText = async () => {
     if (page) params['page'] = page;
     const rows = await getTableUpdate(params);
     if (tableBody) tableBody.innerHTML = rows;
+    syncCheckboxesToSet();
 };
 
 // Begin text search on Enter
@@ -88,6 +99,7 @@ const refreshTable = async () => {
     tableBody.innerHTML = '';
     const rows = await getTableUpdate({ page, query });
     if (tableBody) tableBody.innerHTML = rows ?? lastContent;
+    resetSelection();
 }
 
 // Refresh table on Enter
@@ -99,7 +111,6 @@ refreshButton.addEventListener('click', () => {
         refreshButton.disabled = false;
     }, 500));
 });
-
 
 // Show modal dialog implementation
 /** @param {HTMLButtonElement} button */
@@ -114,7 +125,6 @@ const openDetails = async (button) => {
 
 // Close dialog on 'X' button click
 closeDialogButton.addEventListener('click', () => dialog.close());
-
 
 // Send transfer request implementation
 const sendTransferRequest = async () => {
@@ -169,6 +179,7 @@ const previousPage = async () => {
     console.log({ page });
     const rows = await getTableUpdate({ page, query });
     if (tableBody) tableBody.innerHTML = rows;
+    syncCheckboxesToSet();
 }
 
 // Load next page on '>' button click
@@ -180,10 +191,30 @@ const nextPage = async () => {
     page++;
     const rows = await getTableUpdate({ page, query });
     if (tableBody) tableBody.innerHTML = rows;
+    syncCheckboxesToSet();
 }
 
 // Load next page on '>' button click
 nextPageButton.addEventListener('click', nextPage);
+
+// Confirmation dialog implementation
+const showConfirmationDialog = () => {
+    if (!rowIds.size) return showAlert('Debe seleccionar al menos un registro para transferir.');
+    
+    const list = Array.from(rowIds);
+    confirmDialog.showModal();
+};
+
+// Show confirmation dialog on transfer button click
+submitTransferButton.addEventListener('click', showConfirmationDialog);
+
+// Hide confirmation dialog implementation
+const cancelTransfer = () => {
+    confirmDialog.close();
+}
+
+// Hide confirmation dialog on cancel button click
+cancelTransferButton.addEventListener('click', cancelTransfer);
 
 /**
  * Request a re-render of the table as HTML.
@@ -206,6 +237,24 @@ const getTableUpdate = async ({ page, query } = {}) => {
         nextPageButton.disabled = response.headers.get('X-Is-Last-Page')?.trim() === 'true';
         return await response.text();
     }
+};
+
+// Clear checkboxes and Set implementation
+const resetSelection = () => {
+    rowIds.clear();
+    if (selectAll) selectAll.checked = false;
+    if (submitTransferButton) submitTransferButton.disabled = true;
+};
+
+// Re-check boxes according to Set implementation
+const syncCheckboxesToSet = () => {
+    const checkboxes = tableBody.querySelectorAll('input[type="checkbox"][name="row-ids"]');
+    checkboxes.forEach((c) => {
+        c.checked = rowIds.has(c.value);
+    });
+
+    if (selectAll) selectAll.checked = checkboxes.length > 0 && Array.from(checkboxes).every(c => c.checked);
+    if (submitTransferButton) submitTransferButton.disabled = !rowIds.size;
 };
 
 /**

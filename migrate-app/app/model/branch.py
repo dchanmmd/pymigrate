@@ -1,52 +1,55 @@
 from app.db.metadata import rds_metadata
 from datetime import datetime
+from typing import Optional
 from sqlmodel import SQLModel, Field
+
 
 class Branch(SQLModel, table=True):
     metadata = rds_metadata
     __tablename__ = 'app_sucursales'
+
     id: int = Field(primary_key=True)
-    idTabla: int
-    siglas: str
-    clave: int
-    ordenamiento: int
-    ip: str
-    meraki: str
-    razonSocial: str
-    nombreComercial: str
-    alias: str
-    rfc: str
-    direccion: str
-    ciudad: str
-    municipio: str
-    idDistrito: int
-    idCorregimiento: int
-    telefono: str
-    cp: int
-    region: str
-    zona: str
-    provincia: str
-    latitud: str
-    longitud: str
-    horarioEmpenos: str
-    horarioRetiros: str
-    horarioWU: str
-    horarioVentas: str
-    fluyapp: str
-    googleMaps: str
-    activa: int
-    cuenta: str
-    IDOrigen: int
-    Actualizar: int
-    ElConix_Companie: str
-    ElConix_CentroCosto: str
-    rucFiscal: str
-    dvFiscal: str
-    grupo: int
-    visible: int
-    migrada: datetime
-    estado: int
-    eliminado: int
-    doc_jefe_unidad: str
-    created_at: datetime
-    updated_at: datetime
+    idTabla: Optional[int] = Field(default=None)
+    siglas: Optional[str] = Field(default=None)
+    clave: Optional[int] = Field(default=None)
+    ordenamiento: Optional[int] = Field(default=None)
+    ip: Optional[str] = Field(default=None)
+    meraki: Optional[str] = Field(default=None)
+    razonSocial: Optional[str] = Field(default=None)
+    nombreComercial: Optional[str] = Field(default=None)
+    alias: Optional[str] = Field(default=None)
+    rfc: Optional[str] = Field(default=None)
+    direccion: Optional[str] = Field(default=None)
+    ciudad: Optional[str] = Field(default=None)
+    municipio: Optional[str] = Field(default=None)
+    idDistrito: Optional[int] = Field(default=None)
+    idCorregimiento: Optional[int] = Field(default=None)
+    telefono: Optional[str] = Field(default=None)
+    cp: Optional[int] = Field(default=None)
+    region: Optional[str] = Field(default=None)
+    zona: Optional[str] = Field(default=None)
+    provincia: Optional[str] = Field(default=None)
+    latitud: Optional[str] = Field(default=None)
+    longitud: Optional[str] = Field(default=None)
+    horarioEmpenos: Optional[str] = Field(default=None)
+    horarioRetiros: Optional[str] = Field(default=None)
+    horarioWU: Optional[str] = Field(default=None)
+    horarioVentas: Optional[str] = Field(default=None)
+    fluyapp: Optional[str] = Field(default=None)
+    googleMaps: Optional[str] = Field(default=None)
+    activa: Optional[int] = Field(default=None)
+    cuenta: Optional[str] = Field(default=None)
+    IDOrigen: Optional[int] = Field(default=None)
+    Actualizar: Optional[int] = Field(default=None)
+    ElConix_Companie: Optional[str] = Field(default=None)
+    ElConix_CentroCosto: Optional[str] = Field(default=None)
+    rucFiscal: Optional[str] = Field(default=None)
+    dvFiscal: Optional[str] = Field(default=None)
+    grupo: Optional[int] = Field(default=None)
+    visible: Optional[int] = Field(default=None)
+    migrada: Optional[datetime] = Field(default=None)
+    estado: Optional[int] = Field(default=None)
+    eliminado: Optional[int] = Field(default=None)
+    doc_jefe_unidad: Optional[str] = Field(default=None)
+    created_at: Optional[datetime] = Field(default=None)
+    updated_at: Optional[datetime] = Field(default=None)

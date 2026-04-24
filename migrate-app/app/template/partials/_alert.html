@@ -1,0 +1,8 @@
+<div id="alert" role="alert" class="invisible absolute top-4 right-4 min-w-lg max-w-2xl bg-red-200 border border-red-800 gap-2 p-2 items-center">
+    <p id="alert-content" class="flex-1"></p>
+    <button id="close-alert" aria-label="Cerrar alerta" class="cursor-pointer">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+<script src="{{request.url_for('public', path='/js/alert.js')}}"></script>

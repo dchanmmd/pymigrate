@@ -4,15 +4,6 @@ biEye.classList.add('bi', 'bi-eye-fill', 'text-lg', 'text-neutral-600');
 const biEyeSlash = document.createElement('i');
 biEyeSlash.classList.add('bi', 'bi-eye-slash-fill', 'text-lg', 'text-indigo-600');
 
-/** @type {HTMLDivElement} */
-const htmlAlert = document.getElementById('alert');
-
-/** @type {HTMLFormElement} */
-const alertContent = document.getElementById('alert-content');
-
-/** @type {HTMLButtonElement} */
-const closeAlertButton = document.getElementById('close-alert');
-
 /** @type {HTMLFormElement} */
 const loginForm = document.getElementById('login');
 
@@ -23,9 +14,6 @@ const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('toggle-password');
 
 window.addEventListener('DOMContentLoaded', () => {
-    htmlAlert.style.display = 'none';
-    htmlAlert.style.visibility = 'visible';
-    alertContent.textContent = '';
     passwordInput.type = 'password';
     togglePassword.replaceChildren(biEye);
 });
@@ -37,18 +25,6 @@ const changePasswordVisibility = () => {
 };
 
 togglePassword.addEventListener('click', changePasswordVisibility);
-
-/** @param {string} text */
-const showAlert = (text) => {
-    alertContent.textContent = text;
-    htmlAlert.style.display = 'flex';
-};
-
-const closeAlert = () => {
-    htmlAlert.style.display = 'none';
-};
-
-closeAlertButton.addEventListener('click', closeAlert);
 
 
 const sendLoginData = async () => {

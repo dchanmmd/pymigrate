@@ -1,3 +1,26 @@
+from app.model.inventory_entry import InventoryEntry as IE
+from app.model.pawn_type import PawnType as PT
+from app.model.branch import Branch as Br
+from app.model.carat_rating import CaratRating as K
+from sqlmodel import Session, and_, desc, select
+
+# def get_inventory_list(
+#     branch_id: str, page: int, limit: int, search: str | None, rds: Session
+# ):
+#     page_index = page - 1
+#     offset = page_index * limit
+
+#     query = (
+#         select(IE)
+#         .join(Br, IE.sucursalDestino == Br.id)
+#         .outerjoin(PT, IE.tipoDotacion == PT.idTipoEmpeno)
+#         .outerjoin(K, IE.kilates == K.Clave)
+#         .where(and_(IE.cantidad >= 1, IE.sucursalDestino == branch_id))
+#         .order_by(desc(IE.id_entrada_inventario))
+#     )
+
+#     result = rds.exec(query.limit(limit).offset(offset)).all()
+
 def get_inventory_list(branch_id: str, page: int, limit: int, query: str | None) -> tuple[list[dict], bool]:
     print({"branch_id": branch_id, "page": page, "limit": limit, "query": query})
     table = [
@@ -695,5 +718,5 @@ def get_inventory_list(branch_id: str, page: int, limit: int, query: str | None)
 
     start = max(0, page - 1) * limit
     end = start + limit
-    
+
     return (table[start:end], end >= len(table))

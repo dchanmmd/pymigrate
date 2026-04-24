@@ -3,12 +3,7 @@
 {% block title %}Iniciar sesión{% endblock %}
 
 {% block content %}
-<div id="alert" role="alert" class="invisible absolute top-4 right-4 min-w-lg max-w-2xl bg-red-200 border border-red-900 gap-2 p-2 flex items-center">
-    <p id="alert-content" class="flex-1"></p>
-    <button id="close-alert" aria-label="Cerrar alerta" class="cursor-pointer">
-        <i class="bi bi-x-lg"></i>
-    </button>
-</div>
+{% include partial('_alert.html') %}
 <main class="w-full h-screen overflow-hidden flex justify-center items-center bg-amber-50">
     <form id="login" class="contents">
         <div class="rounded-lg shadow-sm bg-white shadow-stone-400 p-8 space-y-12 w-full mx-auto max-w-lg">
