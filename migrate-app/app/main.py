@@ -8,7 +8,6 @@ from fastapi_tailwind import tailwind
 from os import path
 from app.core.logging import config_logger
 from app.api.v1 import v1_router
-from app.api.view_router import router as view_router
 from app.db.session import create_pg
 
 input_css = path.join('app', 'public', 'css', 'input.css')
@@ -24,5 +23,4 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.mount('/public', StaticFiles(directory='app/public'), name='public')
-app.include_router(view_router)
 app.include_router(v1_router)
