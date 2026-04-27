@@ -1,32 +1,56 @@
-import logging
+from collections import Counter
+from uuid import uuid4
+from sqlmodel import Session, select
+
 from app.error.failed_operation_error import FailedOperationError
 from app.error.not_found_error import NotFoundError
-from app.schema.response.job_status_response import JobStatusResponse
-from app.schema.response.item_status import ItemStatus
-from app.db.session import RequiresPostgres
+from app.model.item_result import ItemResult
 from app.model.transfer_job import TransferJob
 from app.model.transfer_job_item import TransferJobItem
-from sqlmodel import select
+from app.schema.response.item_status import ItemStatus
+from app.schema.response.job_summary import JobSummary
 
-logger = logging.getLogger(__name__)
 
-def save_job(row_ids: list[str], session: RequiresPostgres):
-    pass
+class TransferService:
+    pg: Session
 
-def get_job_summary(job_id: str, session: RequiresPostgres):
-    try:
-        job = session.get(TransferJob, job_id)
-        query = select(TransferJobItem).where(TransferJobItem.job_id == job_id)
-        job_items = session.exec(query).all()
-    except Exception as e:
-        logger.error(f"An unknown error occurred while retrieving job data from the database.\n{e}")
-        raise FailedOperationError(f"Ocurrió un error desconocido en el servidor.")
-    else:
-        if job is None:
-            logger.error(f"Attempted to retrieve a job with id '{job_id}' but got None.")
-            raise NotFoundError(f"El trabajo con id '{job_id}' no fue encontrado.")
-        response = JobStatusResponse()
-        response.job_id = job.job_id
-        response.status = job.status
-        response.completed_at = job.completed_at
-        response.items = [ItemStatus(i.item_id, i.row_id, i.result) for i in job_items]
+    def __init__(self, pg: Session):
+        self.pg = pg
+
+    def save_job(self, row_ids: list[str]):
+        job = TransferJob()
+        self.pg.add(job)
+        self.pg.flush()
+        self.pg.add_all(
+            [TransferJobItem(job_id=job.job_id, row_id=id) for id in row_ids]
+        )
+        self.pg.commit()
+        return job.job_id
+
+    def get_job_summary(self, job_id: str):
+        try:
+            job = self.pg.get(TransferJob, job_id)
+            query = select(TransferJobItem).where(TransferJobItem.job_id == job_id)
+            job_items = self.pg.exec(query).all()
+        except Exception as e:
+            raise FailedOperationError(
+                f"Ocurrió un error desconocido en el servidor.", str(e)
+            )
+        else:
+            if job is None:
+                raise NotFoundError(f"El trabajo con id '{job_id}' no fue encontrado.")
+
+            counts = Counter(i.result for i in job_items)
+            response = JobSummary(
+                job_id=job.job_id,
+                status=job.status,
+                completed_at=job.completed_at,
+                recount={
+                    ItemResult.Success: counts[ItemResult.Success],
+                    ItemResult.Failure: counts[ItemResult.Failure],
+                    ItemResult.Pending: counts[ItemResult.Pending],
+                },
+                items=[ItemStatus(item_id=i.item_id, row_id=i.row_id, result=i.result) for i in job_items],
+            )
+
+            return response

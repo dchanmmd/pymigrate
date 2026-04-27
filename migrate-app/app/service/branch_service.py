@@ -1,10 +1,16 @@
-from app.model.branch import Branch
-from app.model.simple_branch import SimpleBranch
 from sqlmodel import Session, select
 
-mmd_si = 3
+from app.model.branch import Branch
+from app.model.simple_branch import SimpleBranch
 
-def get_branch_list(rds: Session):
-    query = select(Branch.id, Branch.nombreComercial).where(Branch.grupo == mmd_si)
-    result = rds.exec(query).all()
-    return [SimpleBranch(id=str(r[0]), name=str(r[1])) for r in result]
+class BranchService:
+    __mmd_si: int = 3
+    rds: Session
+
+    def __init__(self, rds: Session):
+        self.rds = rds
+
+    def get_branch_list(self):
+        query = select(Branch.id, Branch.nombreComercial).where(Branch.grupo == self.__mmd_si)
+        result = self.rds.exec(query).all()
+        return [SimpleBranch(id=str(r[0]), name=str(r[1])) for r in result]

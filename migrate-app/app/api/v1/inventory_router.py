@@ -1,28 +1,34 @@
-from app.core.templating import templates
-from app.schema.request.transfer_request import TransferRequest
-from app.service.inventory_service import get_inventory_list
-from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends
+
+from app.db.session import RequiresRDS
+from app.model.inventory_details import InventoryDetails
+from app.schema.response.item_response import ItemResponse
+from app.schema.response.list_response import ListResponse
+from app.service.inventory_service import InventoryService
+
+def __get_service(rds: RequiresRDS):
+    return InventoryService(rds)
+
+RequiresInventoryService = Annotated[InventoryService, Depends(__get_service)]
 
 router = APIRouter(prefix='/inventory')
 
-@router.get('/{branch_id}/rows', response_class=HTMLResponse)
-def get_item_list(request: Request, branch_id: str, page: int = 1, query: str = None):
-    print({ 'branch_id': branch_id, 'page': page, 'query': query })
-    inventory, last = get_inventory_list(branch_id, page, 10, query)
-    
-    response = templates.TemplateResponse(request, name='partials/_inv-rows.html', context={ 'inventory': inventory });
-    response.headers['X-Is-Last-Page'] = str(last).lower()
-    return response
+@router.get('/{branch_id}', response_model=ListResponse[InventoryDetails])
+def get_item_list(
+    service: RequiresInventoryService,
+    branch_id: str, 
+    page: int = 1, 
+    query: Optional[str] = None
+):
+    result = service.get_items_by_branch(branch_id, 10, page, query)
+    return ListResponse(success=True, message='Se obtuvieron las filas con éxito', data=result)
 
-@router.get('/{branch_id}/rows/{item_id}', response_class=HTMLResponse)
-def get_item_details(request: Request, branch_id: str, item_id: str):
-    print({ 'branch_id': branch_id, 'item_id': item_id})
-    items, _ = get_inventory_list(branch_id, 1, 30, None)
-    item = [i for i in items if i['barcode'] == item_id][0]
-    return templates.TemplateResponse(request, name='partials/_item-details.html', context={ 'item': item })
-
-@router.post('/transfer', status_code=202)
-def register_transfer_job(body: TransferRequest):
-    print(body.__dict__)
-    return
+@router.get('/{branch_id}/{item_id}', response_model=ItemResponse[InventoryDetails])
+def get_single_item(
+    service: RequiresInventoryService,
+    branch_id: str, 
+    item_id: str
+):
+    result = service.get_item_by_id(branch_id, item_id)
+    return ItemResponse(success=True, message='Se obtuvo el registro con éxito', data=result)
