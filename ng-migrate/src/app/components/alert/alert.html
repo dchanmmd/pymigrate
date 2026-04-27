@@ -1,0 +1,9 @@
+@if (alertText()) {
+    <div role="alert"
+        class="invisible absolute top-4 right-4 min-w-lg max-w-2xl bg-red-200 border border-red-800 gap-2 p-2 items-center">
+        <p class="flex-1">{{ alertText() }}</p>
+        <button aria-label="Cerrar alerta" (click)="close.emit()" class="cursor-pointer">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+}
