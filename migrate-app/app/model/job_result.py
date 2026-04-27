@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
-class JobResult(str, Enum):
+class JobResult(StrEnum):
     Success = 'éxito'
     PartialSuccess = 'éxito parcial'
     Failure = 'fracaso'

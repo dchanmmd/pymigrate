@@ -17,10 +17,7 @@ output_css = path.join('app', 'public', 'css', 'output.css')
 async def lifespan(_: FastAPI):
     config_logger()
     create_pg()
-    process = tailwind.compile(output_css, tailwind_stylesheet_path=input_css)
     yield
-    process.terminate()
 
 app = FastAPI(lifespan=lifespan)
-app.mount('/public', StaticFiles(directory='app/public'), name='public')
 app.include_router(v1_router)

@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
-class ItemResult(str, Enum):
+class ItemResult(StrEnum):
     Pending = 'pendiente'
     Success = 'éxito'
     Failure = 'fracaso'

@@ -1,16 +1,5 @@
 name: pymigrate
 services:
-  app:
-    build:
-      context: ./migrate-app
-      dockerfile: Dockerfile
-    ports: 
-      - "3000:3000"
-    env_file:
-      - ./migrate-app/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
   postgres:
       image: postgres:18-alpine
       ports: 
@@ -26,5 +15,24 @@ services:
         interval: 3s
         timeout: 3s
         retries: 3
+  api:
+    build:
+      context: ./migrate-app
+      dockerfile: Dockerfile
+    ports: 
+      - "3000:3000"
+    env_file:
+      - ./migrate-app/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+  web:
+    build:
+      context: ./ng-migrate
+      dockerfile: Dockerfile
+    ports: 
+      - "8080:80"
+    depends_on:
+      - api
 volumes:
   postgresdata:
