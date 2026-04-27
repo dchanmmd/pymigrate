@@ -1,9 +1,10 @@
-import { Component } from "@angular/core";
+import { Component, inject, Signal,  } from "@angular/core";
 import { Header } from "../../components/header/header";
-import { httpResource } from "@angular/common/http";
 import { Branch } from "../../common/interface/branch.interface";
-import { environment } from "../../../environments/environment";
 import { BranchCard } from "../../components/branch-card/branch-card";
+import { BranchService } from "./branch.service";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { map, tap } from "rxjs";
 
 @Component({
     selector: "app-branch-view",
@@ -11,8 +12,12 @@ import { BranchCard } from "../../components/branch-card/branch-card";
     templateUrl: "./branch-view.html"
 })
 export class BranchView {
-    branches = httpResource<Array<Branch>>(
-        () => new URL("/api/v1/branches", environment.apiUrl).toString(),
-        { defaultValue: [] }
+    private readonly branchService: BranchService = inject(BranchService);
+    public branches: Signal<Array<Branch>> = toSignal(
+        this.branchService.fetchBranchList().pipe(tap(response => console.log(response)), map(response => response.data)),
+        { initialValue: [] }
     );
+
+
+
 }
