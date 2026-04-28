@@ -3,5 +3,5 @@ from sqlmodel import SQLModel
 
 class SimpleBranch(SQLModel):
     metadata = rds_metadata
-    id: str
+    id: int
     name: str

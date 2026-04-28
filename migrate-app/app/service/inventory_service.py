@@ -8,7 +8,7 @@ from app.model.pawn_type import PawnType as PT
 from app.model.carat_rating import CaratRating as CR
 
 from typing import Optional
-from sqlmodel import Session, select, and_
+from sqlmodel import Session, func, select, and_
 
 class InventoryService:
     rds: Session
@@ -46,6 +46,16 @@ class InventoryService:
             .join(CR, IE.kilates == CR.Clave)
             .where(and_(*conditions))
             .order_by(IE.id_entrada_inventario.desc())
+        )
+    
+    def __count(self, branch_id: str):
+        return (
+            select(func.count())
+            .select_from(IE)
+            .join(Br, IE.sucursalDestino == Br.id)
+            .join(PT, IE.tipoDotacion == PT.idTipoEmpeno)
+            .join(CR, IE.kilates == CR.Clave)
+            .where(and_(IE.cantidad >= 1, IE.sucursalDestino == branch_id))
         )
 
     def __details_resolve_name(self, row: ResultTuple) -> str | None:
@@ -104,14 +114,18 @@ class InventoryService:
         self.rds = rds
 
     def get_items_by_branch(
-        self, branch_id: str, limit: int, page: int, stmt: Optional[str] = None
+        self, branch_id: str, limit: int, page: int, query: Optional[str] = None
     ):
         offset = max(0, page - 1) * limit
         stmt = self.__query(branch_id).limit(limit).offset(offset)
         result = self.rds.exec(stmt).all()
         return [self.__to_details(r) for r in result]
+    
+    def get_count_by_branch(self, branch_id: str):
+        result = self.rds.exec(self.__count(branch_id)).one()
+        return result
 
     def get_item_by_id(self, branch_id: str, item_id: str):
         query = self.__query(branch_id, item_id)
-        result = self.rds.exec(query).all()
+        result = self.rds.exec(query).one()
         return self.__to_details(result)

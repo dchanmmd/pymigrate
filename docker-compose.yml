@@ -30,6 +30,8 @@ services:
     build:
       context: ./ng-migrate
       dockerfile: Dockerfile
+    environment:
+      NODE_ENV: PRODUCTION
     ports: 
       - "8080:80"
     depends_on:

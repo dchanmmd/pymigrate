@@ -1,0 +1,10 @@
+import { Component, input, InputSignal } from "@angular/core";
+
+@Component({
+    selector: "app-badge",
+    imports: [],
+    templateUrl: "./badge.html"
+})
+export class Badge {
+    public text: InputSignal<string> = input("");
+}

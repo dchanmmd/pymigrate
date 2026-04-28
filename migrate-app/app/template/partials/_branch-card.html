@@ -1,9 +1,0 @@
-{% macro branch_card(request, id, name) %}
-    <a href="/branches/{{id}}/inventory">
-        <div class="flex flex-col flex-1 h-full p-6 gap-4 rounded-xl border border-neutral-300 outline-2 outline-transparent hover:outline-pink-500 duration-150">
-            <!-- <img src="{{ request.url_for('public', path='/img/placeholder.svg') }}" alt="{{ name }}"> -->
-             <i class="bi bi-shop-window text-yellow-400 text-8xl"></i>
-            <h2 class="font-bold flex-1 text-center">{{ name | title }}</h2>
-        </div>
-    </a>
-{% endmacro %}

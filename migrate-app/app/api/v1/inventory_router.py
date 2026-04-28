@@ -22,7 +22,13 @@ def get_item_list(
     query: Optional[str] = None
 ):
     result = service.get_items_by_branch(branch_id, 10, page, query)
-    return ListResponse(success=True, message='Se obtuvieron las filas con éxito', data=result)
+    count = service.get_count_by_branch(branch_id)
+    return ListResponse(
+        success=True, 
+        message='Se obtuvieron las filas con éxito', 
+        data=result, 
+        metadata={ 'count': count }
+    )
 
 @router.get('/{branch_id}/{item_id}', response_model=ItemResponse[InventoryDetails])
 def get_single_item(

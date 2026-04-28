@@ -1,1 +1,352 @@
-<p>inventory-view works!</p>
+<app-header></app-header>
+<app-dialog>
+    @switch (dialogMode()) {
+    @case ("detail") {
+    @if (selectedItem(); as item) {
+    <h2 class="text-xl font-bold">Detalles del producto</h2>
+    <div class="flex w-full justify-center">
+        <div class="w-full space-y-6">
+            <div class="overflow-y-auto py-4 max-h-145">
+                <div class=" space-y-4">
+                    <p class="space-x-2">
+                        <span class="font-bold">Código de barra:</span>
+                        @if (item.barcode) {
+                        <span>{{ item.barcode }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Nombre:</span>
+                        @if (item.name) {
+                        <span>{{ item.name }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Unidad de medición:</span>
+                        @if (item.uom) {
+                        <span>{{ item.uom }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Unidad de medición (compra):</span>
+                        @if (item.purchase_uom) {
+                        <span>{{ item.purchase_uom }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Peso:</span>
+                        @if (item.weight) {
+                        <span>{{ item.weight }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">¿Puede ser vendido?:</span>
+                        <span>
+                            @if (item.can_be_sold) {
+                            <i class="bi bi-check text-emerald-600"></i>
+                            Sí
+                            } @else {
+                            <i class="bi bi-x text-red-600"></i>
+                            No
+                            }
+                        </span>
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">¿Puede ser comprado?:</span>
+                        <span>
+                            @if (item.can_be_bought) {
+                            <i class="bi bi-check text-emerald-600"></i>
+                            Sí
+                            } @else {
+                            <i class="bi bi-x text-red-600"></i>
+                            No
+                            }
+                        </span>
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Tipo de producto:</span>
+                        @if (item.product_type) {
+                        <span>{{ item.product_type }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Impuesto de proveedor:</span>
+                        @if (item.provider_tax) {
+                        <span>{{ item.provider_tax }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Impuesto de cliente:</span>
+                        @if (item.customer_tax) {
+                        <span>{{ item.customer_tax }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Etiquetas:</span>
+                        @if (item.tags) {
+                        <span>{{ item.tags }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Precio de venta:</span>
+                        @if (item.retail_price) {
+                        <span>$&nbsp;{{ toMoney(item.retail_price) }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Coste:</span>
+                        @if (item.cost) {
+                        <span>$&nbsp;{{ toMoney(item.cost) }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <div class="key-value-pair h-fit">
+                        <p class="font-bold">Observaciones:</p>
+                        @if (item.observations) {
+                        <p>{{ item.observations }}</p>
+                        } @else {
+                        <p class="italic">Ninguna.</p>
+                        }
+                    </div>
+                    <p class="space-x-2">
+                        <span class="font-bold">No. de empeño:</span>
+                        @if (item.pawn_no) {
+                        <span>{{ item.pawn_no }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Peso de piedras:</span>
+                        @if (item.stone_weight) {
+                        <span>{{ item.stone_weight }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Marca:</span>
+                        @if (item.brand) {
+                        <span>{{ item.brand }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Modelo:</span>
+                        @if (item.model) {
+                        <span>{{ item.model }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Serie:</span>
+                        @if (item.series) {
+                        <span>{{ item.series }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Sucursal:</span>
+                        @if (item.branch) {
+                        <span>{{ item.branch }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                    <p class="space-x-2">
+                        <span class="font-bold">Categoría:</span>
+                        @if (item.product_category) {
+                        <span>{{ item.product_category }}</span>
+                        } @else {
+                        <span class="opacity-60">[desconocido]</span>
+                        }
+                    </p>
+                </div>
+            </div>
+            <div class="flex w-full justify-center">
+                @if (isSelected(item.barcode)) {
+                <button (click)="toggleAndClose(item.barcode)"
+                    class="flex px-4 py-1 gap-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg duration-150 cursor-pointer">
+                    <i class="bi bi-dash-lg"></i>
+                    Quitar de la lista
+                </button>
+                } @else {
+                <button (click)="toggleAndClose(item.barcode)"
+                    class="flex px-4 py-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg duration-150 cursor-pointer">
+                    <i class="bi bi-plus-lg"></i>
+                    Agregar a la lista
+                </button>
+                }
+
+            </div>
+        </div>
+    </div>
+    }
+    }
+    @case ("confirm") {
+    <h2 class="text-xl font-bold">Confirmar transferencia</h2>
+    <p class="text-sm opacity-60">Los siguientes productos serán transferidos:</p>
+    <ul id="transfer-summary" class="p-4 space-y-2 max-h-64 overflow-y-auto text-lg">
+        @for (barcode of selectedBarcodes(); track barcode) {
+            <li>{{ barcode }}</li>
+        }
+    </ul>
+    <div class="flex justify-end gap-3 pt-2">
+        <button type="button" (click)="dialog().close()"
+            class="px-4 py-2 rounded-lg border border-neutral-300 cursor-pointer hover:bg-neutral-100 duration-150">
+            Regresar
+        </button>
+        <button type="submit" form="transfer-form"
+            class="px-4 py-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 duration-150 cursor-pointer">
+            Confirmar
+        </button>
+    </div>
+    }
+    }
+</app-dialog>
+<main class="p-4 w-full max-w-7xl mx-auto space-y-8">
+    <h1 class="text-2xl font-semibold">Inventario: Sucursal {{ branch()?.name }}</h1>
+    <div class="space-y-4">
+        <div class="flex w-full justify-between">
+            <div
+                class="flex items-center gap-2 border border-neutral-300 rounded-lg px-2 py-1 text-lg w-full max-w-md outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
+                <i class="bi bi-search opacity-60"></i>
+                <input type="search" class="flex-1 focus:outline-none" [ngModel]="query()"
+                    (ngModelChange)="query.set($event)" placeholder="Buscar por nombre, SKU o código...">
+                <button type="button" aria-label="Borrar barra de búsqueda" class="cursor-pointer"
+                    (click)="clearSearchBar()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="button" aria-label="Refrescar tabla" (click)="refresh()"
+                    class="flex justify-center items-center rounded-full aspect-square p-2 border border-neutral-300 cursor-pointer">
+                    <i class="bi bi-arrow-clockwise px-0.5"></i>
+                </button>
+                <button [disabled]="!selectedCount()" (click)="openConfirm()"
+                    class="px-4 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-200 disabled:text-neutral-600 duration-150 cursor-pointer">
+                    Transferir
+                </button>
+            </div>
+        </div>
+        <form id="transfer-form" method="post" class="contents" (ngSubmit)="onFormSubmit($event)">
+            <div class="overflow-x-auto">
+                <table class="w-full rounded-lg border border-neutral-300 border-separate border-spacing-0">
+                    <thead>
+                        <tr class="group">
+                            <th class="border-b border-neutral-300 text-left p-2">
+                                <input id="select-all" type="checkbox" [checked]="isAllSelected()"
+                                    (change)="toggleAll()">
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Código de barra
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Nombre
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Peso
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Precio de Venta
+                            </th>
+                            <th class="border-b border-neutral-300 text-left p-2 text-sm opacity-80 font-bold">
+                                Coste
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        @if (inventory() && inventory()!.length) {
+                        @for (item of inventory(); track item.barcode) {
+                        <tr class="group">
+                            <td class="group-not-last:border-b border-neutral-300 p-2">
+                                <input type="checkbox" name="row-ids" [checked]="isSelected(item.barcode)"
+                                    (change)="toggleItem(item.barcode)">
+                            </td>
+                            <td class="group-not-last:border-b border-neutral-300 p-2">
+                                <button type="button" aria-label="Abrir detalle del producto" (click)="openDetail(item)"
+                                    class="text-indigo-700 hover:underline cursor-pointer">
+                                    {{ item.barcode }}
+                                </button>
+                            </td>
+                            <td class="group-not-last:border-b border-neutral-300 p-2 max-w-50">
+                                <p class="line-clamp-1">{{ item.name }}</p>
+                            </td>
+                            <td class="group-not-last:border-b border-neutral-300 p-2">
+                                <p class="line-clamp-1">
+                                    {{ item.weight }}
+                                    <span class="text-xs font-bold opacity-60">g</span>
+                                </p>
+                            </td>
+                            <td class="group-not-last:border-b border-neutral-300 p-2">
+                                <p class="line-clamp-1">
+                                    <span class="font-bold opacity-60">$</span>
+                                    {{ toMoney(item.retail_price) }}
+                                </p>
+                            </td>
+                            <td class="group-not-last:border-b border-neutral-300 p-2">
+                                <p class="line-clamp-1">
+                                    <span class="font-bold opacity-60">$</span>
+                                    {{ toMoney(item.cost) }}
+                                </p>
+                            </td>
+                        </tr>
+                        }
+                        } @else {
+                        <tr>
+                            <td colspan="9999" class="p-2">
+                                <p class="w-full text-center opacity-60">No se encontraron registros.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        <div class="w-full flex justify-between py-2">
+            <div>
+                <p class="text-xs opacity-60">Página {{page()}} de {{totalPages()}}</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button type="button" aria-label="Mostrar previa página" (click)="prevPage()"
+                    [disabled]="!hasPrevPage()"
+                    class="rounded-lg p-2 border border-neutral-300 disabled:bg-neutral-200 disabled:border-neutral-200 cursor-pointer">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button type="button" aria-label="Mostrar siguiente página" (click)="nextPage()"
+                    [disabled]="!hasNextPage()"
+                    class="rounded-lg p-2 border border-neutral-300 disabled:bg-neutral-200 disabled:border-neutral-200 cursor-pointer">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+@if (selectedCount()) {
+<app-badge [text]="`${selectedCount()} Seleccionados`"></app-badge>
+}

@@ -1,4 +1,4 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, and_, select
 
 from app.model.branch import Branch
 from app.model.simple_branch import SimpleBranch
@@ -14,3 +14,9 @@ class BranchService:
         query = select(Branch.id, Branch.nombreComercial).where(Branch.grupo == self.__mmd_si)
         result = self.rds.exec(query).all()
         return [SimpleBranch(id=str(r[0]), name=str(r[1])) for r in result]
+    
+    def get_by_id(self, branch_id: int):
+        query = select(Branch.id, Branch.nombreComercial).where(and_(Branch.grupo == self.__mmd_si, Branch.id == branch_id))
+        result = self.rds.exec(query).all()
+        item = result[0]
+        return SimpleBranch(id=item[0], name=item[1])

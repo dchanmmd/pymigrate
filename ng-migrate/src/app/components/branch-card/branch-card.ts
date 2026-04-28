@@ -1,5 +1,6 @@
 import { Component, computed, input, InputSignal, Signal } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import { toMMDTitle } from "@app/common/lib/functions";
 
 @Component({
     selector: "app-branch-card",
@@ -11,10 +12,5 @@ export class BranchCard {
     id: InputSignal<number> = input.required<number>();
     name: InputSignal<string> = input.required<string>();
 
-    title: Signal<string> = computed(() => this.name()
-        .split(" ")
-        .filter(Boolean)
-        .map(w => w.at(0)?.toUpperCase() + w.slice(1).toLowerCase())
-        .join(" ")
-    );
+    title: Signal<string> = computed(() => toMMDTitle(this.name()));
 }
