@@ -9,7 +9,6 @@ export class Dialog {
     public open: WritableSignal<boolean> = signal(false);
     public modal: InputSignal<boolean> = input(false);
 
-
     public closeNonModal() {
         if (!this.modal()) this.open.set(false);
     }

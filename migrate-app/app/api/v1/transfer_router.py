@@ -2,7 +2,6 @@ from typing import Annotated
 
 from app.db.session import RequiresPostgres
 from app.schema.response.item_response import ItemResponse
-from app.schema.response.list_response import ListResponse
 from app.schema.response.job_summary import JobSummary
 from app.error.failed_operation_error import FailedOperationError
 from app.error.not_found_error import NotFoundError
@@ -21,15 +20,7 @@ router = APIRouter(prefix='/transfers')
 def create_transfer_job(data: TransferRequest, service: RequiresTransferService):
     try: 
         job_id = service.save_job(data.row_ids)
-        return ItemResponse[str](success=True, message='El trabajo fue creado exitosamente.', data=job_id)
-    except RuntimeError as e:
-        raise HTTPException(500, detail=str(e))
-    
-@router.get('/', response_model=ListResponse[JobSummary])
-def check_job_list(service: RequiresTransferService):
-    try: 
-        jobs = service.get_job_list('') # TODO autenticación
-        return ListResponse(success=True, message='Se obtuvieron los reportes con éxito.', data=jobs)
+        return ItemResponse[str](success=True, message="El trabajo fue creado exitosamente.", data=job_id)
     except RuntimeError as e:
         raise HTTPException(500, detail=str(e))
 

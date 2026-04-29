@@ -14,7 +14,7 @@ import { map, tap } from "rxjs";
 export class BranchView {
     private readonly branchService: BranchService = inject(BranchService);
     public branches: Signal<Array<Branch>> = toSignal(
-        this.branchService.fetchBranchList().pipe(map(response => response.data)),
+        this.branchService.fetchBranchList().pipe(tap(response => console.log(response)), map(response => response.data)),
         { initialValue: [] }
     );
 }

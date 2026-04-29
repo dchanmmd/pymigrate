@@ -10,8 +10,7 @@ from sqlmodel import Field, SQLModel
 class TransferJob(SQLModel, table=True):
     metadata = pg_metadata
     __tablename__ = 'transfer_jobs'
-    job_id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
-    owner_id: str = Field(default='')
+    job_id: str = Field(default_factory= lambda: str(uuid4()), primary_key=True)
     status: JobStatus = Field(sa_column=Column(Enum(JobStatus, name='job_status'), default=JobStatus.Pending, nullable=False))
     result: JobResult | None = Field(sa_column=Column(Enum(JobResult, name='job_result'), nullable=True))
     pushed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

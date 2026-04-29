@@ -228,11 +228,7 @@
     }
 </app-dialog>
 <main class="p-4 w-full max-w-7xl mx-auto space-y-8">
-    @if (branch()) {
-        <h1 class="text-2xl font-semibold">Inventario: Sucursal {{ branch()?.name }}</h1>
-    } @else {
-        <h1 class="text-2xl font-semibold min-w-32 animate-pulse">&nbsp;</h1>
-    }
+    <h1 class="text-2xl font-semibold">Inventario: Sucursal {{ branch()?.name }}</h1>
     <div class="space-y-4">
         <div class="flex w-full justify-between">
             <div
@@ -352,5 +348,5 @@
 </main>
 
 @if (selectedCount()) {
-<app-badge [text]="`${selectedCount()} Seleccionado${selectedCount() > 1 ? 's' : ''}`"></app-badge>
+<app-badge [text]="`${selectedCount()} Seleccionados`"></app-badge>
 }

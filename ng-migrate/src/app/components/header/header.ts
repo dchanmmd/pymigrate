@@ -1,11 +1,10 @@
 import { Component } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { Tooltip } from "../tooltip/tooltip";
 
 @Component({
     selector: "app-header",
     standalone: true,
-    imports: [RouterModule, Tooltip],
+    imports: [RouterModule],
     templateUrl: "./header.html"
 })
 export class Header {}
