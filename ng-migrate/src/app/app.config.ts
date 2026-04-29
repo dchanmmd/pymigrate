@@ -8,5 +8,4 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes, withComponentInputBinding()), 
         provideHttpClient()
     ]
-}
-
+};

@@ -155,6 +155,7 @@ export class InventoryView {
 
             },
             complete: () => {
+                this.selectedBarcodes.update(() => new Set());
                 this.dialog().close();
             }
         });

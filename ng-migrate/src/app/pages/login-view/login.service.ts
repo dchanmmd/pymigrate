@@ -16,7 +16,7 @@ interface LoginResponse {
 export class LoginService {
     constructor(private readonly http: HttpClient) { }
 
-    login(data: LoginRequest): Observable<any> {
+    login(data: LoginRequest): Observable<LoginResponse> {
         const url = new URL("/api/v1/auth/login", environment.apiUrl);
         return this.http.post<LoginResponse>(url.toString(), data);
     }
