@@ -15,21 +15,9 @@ pg_engine  = _make_engine(env.pg_url)
 rds_engine = _make_engine(env.rds_url)
 
 
-def get_pg_session():
-    with Session(pg_engine) as session:
-        try:
-            yield session
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
+def get_pg_session() -> Session:
+    return Session(pg_engine)
 
 
 def get_rds_session():
-    with Session(rds_engine) as session:
-        try:
-            yield session
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
+    return Session(rds_engine)

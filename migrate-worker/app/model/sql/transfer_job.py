@@ -2,8 +2,8 @@ from datetime import datetime
 
 from sqlmodel import Column, Enum, Field, SQLModel
 from typing import Optional
-from app.model.job_result import JobResult
-from app.model.job_status import JobStatus
+from app.model.sql.job_result import JobResult
+from app.model.sql.job_status import JobStatus
 
 class TransferJob(SQLModel, table=True):
     __tablename__ = 'transfer_jobs'

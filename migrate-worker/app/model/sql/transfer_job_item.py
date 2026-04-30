@@ -1,4 +1,4 @@
-from app.model.item_result import ItemResult
+from app.model.sql.item_result import ItemResult
 from sqlmodel import Column, Enum, Field, SQLModel
 
 class TransferJobItem(SQLModel, table=True):

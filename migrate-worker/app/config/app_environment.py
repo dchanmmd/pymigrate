@@ -15,6 +15,11 @@ class AppEnvironment(Environment):
     PG_PASSWORD: str
     PG_NAME: str
 
+    ODOO_USER: str 
+    ODOO_PASSWORD: str 
+    ODOO_URL: str 
+    ODOO_DB: str 
+
     @property
     def pg_url(self):
         return f"{self.PG_DRIVER}://{self.PG_USER}:{self.PG_PASSWORD}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_NAME}"
