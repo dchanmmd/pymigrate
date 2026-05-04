@@ -13,6 +13,6 @@ button, a, input[type="submit"], input[type="reset"] {
         rotate: 0deg;
     }
     to {
-        roate: 360deg;
+        rotate: 360deg;
     }
 }

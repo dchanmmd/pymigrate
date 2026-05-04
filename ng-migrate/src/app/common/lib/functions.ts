@@ -14,3 +14,15 @@ export const toMMDTitle = (text: string) => {
 
     return result.join(" ");
 };
+
+export const toMoney = (money: number) => {
+    const fixed = money.toFixed(2);
+    const [integer, decimal] = fixed.split(".");
+    const fragments = [];
+
+    for (let i = integer.length; i > 0; i -= 3) {
+        fragments.unshift(integer.slice(Math.max(0, i - 3), i));
+    }
+
+    return `${fragments.join(",")}.${decimal}`;
+}

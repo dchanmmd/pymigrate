@@ -1,0 +1,40 @@
+<div class="w-full flex flex-col gap-6 rounded-lg bg-neutral-50 border border-neutral-300 p-4">
+    <div class="space-y-2">
+        <h2 class="text-lg font-semibold">Transferencia del {{ pushedAt() }}</h2>
+        <p class="text-sm uppercase">
+            <span class="opacity-60 font-bold">Estado:</span>
+            &nbsp;
+            @switch (job().status) {
+            @case (JobStatus.Completed) {
+            <span class="px-2 rounded-full bg-indigo-400 font-semibold">{{ job().status }}</span>
+            }
+            @case (JobStatus.Pending) {
+            <span class="px-2 rounded-full bg-neutral-300 font-semibold">{{ job().status }}</span>
+            } @case (JobStatus.Processing) {
+            <span class="px-2 rounded-full bg-yellow-500 font-semibold">{{ job().status }}</span>
+            }
+            }
+        </p>
+    </div>
+    <div class="space-y-2 flex-1">
+        <h3 class="font-bold">Detalle</h3>
+        <ul>
+            <li class="flex gap-2 items-center">
+                <div class="size-3 rounded-full bg-green-500"></div>
+                <p>Éxito&nbsp;<em class="opacity-60">({{success()}})</em></p>
+            </li>
+            <li class="flex gap-2 items-center">
+                <div class="size-3 rounded-full bg-red-500"></div>
+                <p>Fracaso&nbsp;<em class="opacity-60">({{failure()}})</em></p>
+            </li>
+            <li class="flex gap-2 items-center">
+                <div class="size-3 rounded-full bg-neutral-300"></div>
+                <p>Pendiente&nbsp;<em class="opacity-60">({{pending()}})</em></p>
+            </li>
+        </ul>
+    </div>
+    <div class="w-full flex h-2 rounded-full bg-neutral-300 overflow-hidden">
+        <div class="last:rounded-r-full h-full bg-green-500" [style.width]="(success() / count() * 100) + '%'"></div>
+        <div class="last:rounded-r-full h-full bg-red-500" [style.width]="(failure() / count() * 100) + '%'"></div>
+    </div>
+</div>

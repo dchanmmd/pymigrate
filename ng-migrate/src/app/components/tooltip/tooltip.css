@@ -10,9 +10,11 @@
 
 .tooltip:not([data-tip=""]) {
     position: relative;
+    width: fit-content;
 }
 
 .tooltip:not([data-tip=""])::before {
+    width: max-content;
     content: attr(data-tip);
     position: absolute;
     padding-block: 0.125rem;

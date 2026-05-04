@@ -1,0 +1,208 @@
+<h2 class="text-xl font-bold">Detalles del producto</h2>
+<div class="flex w-full justify-center">
+    <div class="w-full space-y-6">
+        <div class="overflow-y-auto py-4 max-h-145">
+            <div class="p-4 space-y-4">
+                <p class="space-x-2">
+                    <span class="font-bold">Código de barra:</span>
+                    @if (item().barcode) {
+                    <span>{{ item().barcode }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Nombre:</span>
+                    @if (item().name) {
+                    <span>{{ item().name }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Descripción:</span>
+                    @if (item().description) {
+                    <p>{{ item().description }}</p>
+                    } @else {
+                    <p class="italic">Ninguna.</p>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Unidad de medición:</span>
+                    @if (item().uom) {
+                    <span>{{ item().uom }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Unidad de medición (compra):</span>
+                    @if (item().purchase_uom) {
+                    <span>{{ item().purchase_uom }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Peso:</span>
+                    @if (item().weight) {
+                    <span>{{ item().weight }}g</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">¿Puede ser vendido?:</span>
+                    <span>
+                        @if (item().can_be_sold) {
+                        <i class="bi bi-check text-emerald-600"></i>
+                        Sí
+                        } @else {
+                        <i class="bi bi-x text-red-600"></i>
+                        No
+                        }
+                    </span>
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">¿Puede ser comprado?:</span>
+                    <span>
+                        @if (item().can_be_bought) {
+                        <i class="bi bi-check text-emerald-600"></i>
+                        Sí
+                        } @else {
+                        <i class="bi bi-x text-red-600"></i>
+                        No
+                        }
+                    </span>
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Tipo de producto:</span>
+                    @if (item().product_type) {
+                    <span>{{ item().product_type }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Impuesto de proveedor:</span>
+                    @if (item().provider_tax) {
+                    <span>{{ item().provider_tax }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Impuesto de cliente:</span>
+                    @if (item().customer_tax) {
+                    <span>{{ item().customer_tax }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Etiquetas:</span>
+                    @if (item().tags) {
+                    <span>{{ item().tags }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Precio de venta:</span>
+                    @if (item().retail_price) {
+                    <span>$&nbsp;{{ toMoney(item().retail_price) }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Coste:</span>
+                    @if (item().cost) {
+                    <span>$&nbsp;{{ toMoney(item().cost) }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <div class="key-value-pair h-fit">
+                    <p class="font-bold">Observaciones:</p>
+                    @if (item().observations) {
+                    <p>{{ item().observations }}</p>
+                    } @else {
+                    <p class="italic">Ninguna.</p>
+                    }
+                </div>
+                <p class="space-x-2">
+                    <span class="font-bold">No. de empeño:</span>
+                    @if (item().pawn_no) {
+                    <span>{{ item().pawn_no }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Peso de piedras:</span>
+                    @if (item().stone_weight) {
+                    <span>{{ item().stone_weight }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Marca:</span>
+                    @if (item().brand) {
+                    <span>{{ item().brand }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Modelo:</span>
+                    @if (item().model) {
+                    <span>{{ item().model }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Serie:</span>
+                    @if (item().series) {
+                    <span>{{ item().series }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Sucursal:</span>
+                    @if (item().branch) {
+                    <span>{{ item().branch }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+                <p class="space-x-2">
+                    <span class="font-bold">Categoría:</span>
+                    @if (item().product_category) {
+                    <span>{{ item().product_category }}</span>
+                    } @else {
+                    <span class="opacity-60">[desconocido]</span>
+                    }
+                </p>
+            </div>
+        </div>
+        <div class="flex w-full justify-center">
+            @if (checked()) {
+            <button type="button" (click)="selected.emit(item())"
+                class="flex px-4 py-1 gap-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg duration-150 cursor-pointer">
+                <i class="bi bi-dash-lg"></i>
+                Quitar de la lista
+            </button>
+            } @else {
+            <button type="button" (click)="selected.emit(item())"
+                class="flex px-4 py-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg duration-150 cursor-pointer">
+                <i class="bi bi-plus-lg"></i>
+                Agregar a la lista
+            </button>
+            }
+        </div>
+    </div>
+</div>

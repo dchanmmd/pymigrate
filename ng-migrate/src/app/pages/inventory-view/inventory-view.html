@@ -1,28 +1,67 @@
-<app-dialog></app-dialog>
+<app-dialog>
+    @switch (dialogType()) {
+    @case ("details") {
+    @if (item(); as item) {
+    <app-item-details [item]="item" [selection]="selection()" (selected)="toggleAndClose($event)"></app-item-details>
+    }
+    }
+    @case ("confirmation") {
+    <h2 class="text-xl font-bold">Confirmar transferencia</h2>
+    <p class="text-sm opacity-60">Los siguientes productos serán transferidos:</p>
+    <ul id="transfer-summary" class="p-4 space-y-2 max-h-64 overflow-y-auto text-lg">
+        @for (item of selection(); track item.barcode) {
+        <li>{{ item.barcode }}</li>
+        }
+    </ul>
+    <div class="flex justify-end gap-3 pt-2">
+        <button type="button" (click)="dialog().hide()"
+            class="px-4 py-2 rounded-lg border border-neutral-300 cursor-pointer hover:bg-neutral-100 duration-150">
+            Regresar
+        </button>
+        <button type="submit" form="transfer-form"
+            class="px-4 py-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 duration-150 cursor-pointer">
+            Confirmar
+        </button>
+    </div>
+    }
+    }
+</app-dialog>
 <app-header></app-header>
 <main class="p-4 w-full max-w-7xl mx-auto space-y-6">
-    <h1 class="text-2xl font-semibold">Inventario: Sucursal</h1>
+    @if (branchResponse.isLoading()) {
+    <h1 class="text-2xl font-semibold flex">
+        <p class="w-44 rounded bg-neutral-300 animate-pulse">&nbsp;</p>
+        &nbsp;
+        <p class="w-32 rounded bg-neutral-300 animate-pulse">&nbsp;</p>
+        &nbsp;
+        <p class="w-80 rounded bg-neutral-300 animate-pulse">&nbsp;</p>
+    </h1>
+    } @else {
+    <h1 class="text-2xl font-semibold">Inventario: Sucursal {{ toMMDTitle(branch()!.name) }}</h1>
+    }
     <div class="space-y-4">
-        <div class="flex w-full justify-between">
-            <div
-                class="flex items-center gap-3 border border-neutral-300 rounded-lg px-2 py-1 text-lg w-full max-w-md outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
-                <i class="bi bi-search text-base opacity-60"></i>
-                <input type="text" [value]="query()" (input)="setQuery($event)" class="flex-1 focus:outline-none"
-                    placeholder="Buscar por código de barra...">
-                @if (query()) {
+        <div class="flex flex-col sm:flex-row w-full items-center gap-4 sm:gap-0 sm:justify-between">
+            <div class="w-full flex-1">
+                <div
+                    class="flex items-center gap-3 border border-neutral-300 rounded-lg px-2 py-1 text-lg w-full sm:max-w-md outline-2 outline-transparent has-focus:outline-pink-500 duration-150">
+                    <i class="bi bi-search text-base opacity-60"></i>
+                    <input type="text" [value]="query()" (input)="setQuery($event)" class="flex-1 focus:outline-none"
+                        placeholder="Buscar por código de barra...">
+                    @if (query()) {
                     <button (click)="clearQuery()" type="button" aria-label="Borrar barra de búsqueda">
                         <i class="bi bi-x-lg"></i>
                     </button>
-                }
+                    }
+                </div>
             </div>
-            <div class="flex gap-4">
+            <div class="flex w-full sm:w-fit gap-4 justify-between sm:justify-start">
                 <app-tooltip tip="Refrescar" position="top">
                     <button type="button" aria-label="Refrescar tabla" [disabled]="reloading()" (click)="reload()"
                         [class]="`flex justify-center items-center rounded-full aspect-square p-2 border border-neutral-300 disabled:bg-neutral-200 disabled:text-neutral-600 cursor-pointer ${reloading() ? 'spin' : ''}`">
                         <i class="bi bi-arrow-clockwise px-1"></i>
                     </button>
                 </app-tooltip>
-                <button (click)="dialog().show()"
+                <button (click)="showConfirmationDialog()" [disabled]="!selection().size"
                     class="px-4 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-200 disabled:text-neutral-600 duration-150 cursor-pointer">
                     Transferir
                 </button>
@@ -61,62 +100,43 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if (selection().size) {
+                    @for (item of [...selection()].filter(i => i.barcode !== item()?.barcode); track item.barcode) {
+                    <tr inv-row [item]="item" class="group" [selection]="selection()" (detail)="showItemDetails()"
+                        (selected)="toggleRow($event)"></tr>
+                    }
+                    } @else if (!response.hasValue() && !query().trim()) {
                     <tr class="group">
-                        @if (!query()) {
-                            <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
-                                <p class="w-full text-center opacity-60">
-                                    Utilice la barra de búsqueda para buscar resultados.
-                                </p>
-                            </td>
-                        } 
-                        @else if (response.isLoading()) {
-                            <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
-                                <div class="w-full flex justify-center">
-                                    <app-spinner></app-spinner>
-                                </div>
-                            </td>
-                        } @else if (response.hasValue()) {
-                            @if (item(); as item) {
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <label for="selectAll" class="group contents">
-                                        <div role="checkbox"
-                                            class="size-5 border border-neutral-300 rounded flex justify-center items-center cursor-pointer">
-                                            <i
-                                                class="bi bi-check-lg text-indigo-500 scale-0 group-has-checked:scale-100 duration-150"></i>
-                                        </div>
-                                        <input type="checkbox" name="rowIds" class="hidden">
-                                    </label>
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    {{ item.barcode }}
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <!-- {{ item.entry }} -->
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <!-- {{ item.description }} -->
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <!-- {{ item.carat_rating }} -->
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <span class="text-sm opacity-80 font-semibold">$</span>{{ item.cost.toFixed(2) }}
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    <span class="text-sm opacity-80 font-semibold">$</span>{{ item.retail_price.toFixed(2) }}
-                                </td>
-                                <td class="group-not-last:border-b border-neutral-300 p-2">
-                                    {{ item.weight }}<span class="text-sm opacity-80 font-semibold">g</span>
-                                </td>
-                            }
-                        } @else if (response.error()) {
-                            <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
-                                <p class="w-full text-center opacity-60">
-                                    Hubo un error al buscar este producto.
-                                </p>
-                            </td>
-                        }
+                        <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
+                            <p class="w-full text-center opacity-60">
+                                Utilice la barra de búsqueda para encontrar resultados.
+                            </p>
+                        </td>
                     </tr>
+                    }
+                    @if (response.isLoading()) {
+                    <tr class="group">
+                        <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
+                            <div class="w-full flex justify-center">
+                                <app-spinner></app-spinner>
+                            </div>
+                        </td>
+                    </tr>
+                    } @else if (response.error()) {
+                    <tr class="group">
+                        <td colspan="9999" class="group-not-last:border-b border-neutral-300 p-2">
+                            <p class="w-full text-center opacity-60">
+                                Hubo un error al buscar este producto.
+                            </p>
+                        </td>
+                    </tr>
+                    } @else if (response.hasValue()) {
+                    @if (item(); as item) {
+                    <tr inv-row [item]="item" class="group" [selection]="selection()" (detail)="showItemDetails()"
+                        (selected)="toggleRow($event)">
+                    </tr>
+                    }
+                    }
                 </tbody>
             </table>
         </div>

@@ -2,16 +2,24 @@
 <main class="p-4 w-full max-w-7xl mx-auto space-y-8">
     <h1 class="text-2xl text-center font-bold">Seleccionar sucursal</h1>
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
-        @let branchList = branches();
-
-        @if (branchList === undefined) {
-            <p class="col-span-4 text-center opacity-60">Cargando sucursales...</p>
-        } @else if (branchList.length) {
-            @for (branch of branchList; track branch.id) {
-                <app-branch-card [id]="branch.id" [name]="branch.name"></app-branch-card>
+        @if (response.isLoading()) {
+            <div class="col-span-4 w-full flex justify-center">
+                <app-spinner></app-spinner>
+            </div>
+        } @else if (response.error()) {
+            <p class="col-span-4 text-center opacity-60">
+            @if (response.statusCode() === 404) {
+                No se han encontrado sucursales.
+            } @else {
+                HUbo un error al buscar las sucursales.
             }
-        } @else {
-            <p class="col-span-4 text-center opacity-60">No se han encontrado sucursales.</p>
+            </p>
+        } @else if (response.hasValue()) {
+            @if (branches()) {
+                @for (branch of branches(); track branch.id) {
+                    <app-branch-card [branch]="branch"></app-branch-card>
+                }
+            }
         }
     </section>
 </main>

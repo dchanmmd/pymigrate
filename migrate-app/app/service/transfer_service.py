@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from uuid import uuid4
 from sqlmodel import Session, select
 
@@ -26,6 +26,41 @@ class TransferService:
         )
         self.pg.commit()
         return job.job_id
+    
+    def __to_summary(self, job: TransferJob, items: list[TransferJobItem]):
+        counts = Counter(i.result for i in items)
+        return JobSummary(
+            job_id=job.job_id,
+            status=job.status,
+            pushed_at=job.pushed_at,
+            completed_at=job.completed_at,
+            recount={
+                ItemResult.Success: counts[ItemResult.Success],
+                ItemResult.Failure: counts[ItemResult.Failure],
+                ItemResult.Pending: counts[ItemResult.Pending],
+            },
+            items=[ItemStatus(item_id=i.item_id, row_id=i.row_id, result=i.result) for i in items],
+        )
+    
+    def get_job_list(self) -> list[JobSummary]:
+        jobs = self.pg.exec(select(TransferJob)).all()
+        job_ids = [job.job_id for job in jobs]
+        items_by_job = defaultdict(list)
+
+        if not job_ids:
+            return []
+
+        job_items = self.pg.exec(select(TransferJobItem).where(TransferJobItem.job_id.in_(job_ids))).all()
+
+        for item in job_items:
+            items_by_job[item.job_id].append(item)
+
+        response = []
+
+        for job in jobs:
+            response.append(self.__to_summary(job, items_by_job[job.job_id]))
+
+        return response
 
     def get_job_summary(self, job_id: str):
         try:
@@ -40,17 +75,5 @@ class TransferService:
             if job is None:
                 raise NotFoundError(f"El trabajo con id '{job_id}' no fue encontrado.")
 
-            counts = Counter(i.result for i in job_items)
-            response = JobSummary(
-                job_id=job.job_id,
-                status=job.status,
-                completed_at=job.completed_at,
-                recount={
-                    ItemResult.Success: counts[ItemResult.Success],
-                    ItemResult.Failure: counts[ItemResult.Failure],
-                    ItemResult.Pending: counts[ItemResult.Pending],
-                },
-                items=[ItemStatus(item_id=i.item_id, row_id=i.row_id, result=i.result) for i in job_items],
-            )
-
+            response = self.__to_summary(job, list(job_items))
             return response

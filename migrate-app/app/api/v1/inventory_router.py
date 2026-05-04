@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.db.session import RequiresRDS
 from app.model.inventory_details import InventoryDetails
@@ -21,6 +21,8 @@ def search_barcode(
     query: str
 ):
     details = service.get_by_barcode(branch_id, query.strip())
+    if details is None:
+        raise HTTPException(404, 'No se encontraron registros para este código de barra')
     return ItemResponse(success=True, message='Se obtuvo el registro con éxito', data=details)
 
 @router.get('/{branch_id}/{barcode}', response_model=ItemResponse[InventoryDetails])
@@ -30,5 +32,7 @@ def by_barcode(
     barcode: str
 ):
     details = service.get_by_barcode(branch_id, barcode)
+    if details is None:
+        raise HTTPException(404, 'No se encontraron registros para este código de barra')
     return ItemResponse(success=True, message='Se obtuvo el registro con éxito', data=details)
 

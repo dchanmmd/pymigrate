@@ -1,7 +1,16 @@
-<nav class="flex items-center px-6 py-2 bg-yellow-300">
-    <div class="flex-1">
-        <a routerLink="/" class="inline-flex">
-            <h1 class="text-xl font-bold">PyMigrate</h1>
-        </a>
-    </div>
-</nav>
+<header>
+    <nav class="flex items-center px-4 md:px-8 xl:px-12 py-2 bg-yellow-300">
+        <div class="flex-1">
+            <a routerLink="/" class="inline-flex">
+                <h1 class="text-xl font-bold">PyMigrate</h1>
+            </a>
+        </div>
+        <div>
+            <app-tooltip tip="Ver trasferencias" position="left">
+                <a routerLink="/transfers">
+                    <i class="bi bi-inbox-fill text-2xl"></i>
+                </a>
+            </app-tooltip>
+        </div>
+    </nav>
+</header>

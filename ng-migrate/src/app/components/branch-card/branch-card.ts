@@ -1,5 +1,6 @@
-import { Component, computed, input, InputSignal, Signal } from "@angular/core";
+import { Component, input, InputSignal } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import { Branch } from "@app/common/interface/branch.interface";
 import { toMMDTitle } from "@app/common/lib/functions";
 
 @Component({
@@ -9,8 +10,9 @@ import { toMMDTitle } from "@app/common/lib/functions";
     templateUrl: "./branch-card.html"
 })
 export class BranchCard {
-    id: InputSignal<number> = input.required<number>();
-    name: InputSignal<string> = input.required<string>();
+    branch: InputSignal<Branch> = input.required<Branch>();
 
-    title: Signal<string> = computed(() => toMMDTitle(this.name()));
+    public toMMDTitle(text: string): string {
+        return toMMDTitle(text);
+    }
 }

@@ -1,0 +1,32 @@
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <label [for]="item().barcode" class="group">
+        <div role="checkbox"
+            class="size-5 border border-neutral-300 rounded flex justify-center items-center cursor-pointer">
+            <i class="bi bi-check-lg text-indigo-500 scale-0 group-has-checked:scale-100 duration-150"></i>
+        </div>
+        <input type="checkbox" name="rowIds" [id]="item().barcode" class="hidden" (change)="selected.emit(item())" [checked]="checked()">
+    </label>
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <app-tooltip tip="Ver detalles" position="right">
+        <button type="button" class="text-indigo-600 hover:underline" (click)="detail.emit()">{{ item().barcode }}</button>
+    </app-tooltip>
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <!-- {{ item().entry }} -->
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <p class="line-clamp-1">{{ item().description }}</p>
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <p class="line-clamp-1">{{ item().carat_rating }}</p>
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <span class="opacity-80 font-semibold">$</span>{{ toMoney(item().cost) }}
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    <span class="text-sm opacity-80 font-semibold">$</span>{{ toMoney(item().retail_price) }}
+</td>
+<td class="group-not-last:border-b border-neutral-300 p-2">
+    {{ item().weight }}<span class="text-sm opacity-80 font-semibold">g</span>
+</td>

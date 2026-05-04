@@ -1,1 +1,19 @@
-<p>job-view works!</p>
+<app-header></app-header>
+<main class="p-4 w-full max-w-7xl mx-auto space-y-6">
+    <h1 class="text-2xl font-semibold">Mis Transferencias</h1>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        @if (response.isLoading()) {
+            <div class="col-span-2 w.full flex justify-center">
+                <app-spinner></app-spinner>
+            </div>
+        } @else if (response.error()) {
+
+        } @else if (response.hasValue()) {
+            @if (jobs()) {
+                @for(job of jobs(); track job.job_id) {
+                    <app-job-card [job]="job"></app-job-card>
+                }
+            }
+        }
+    </section>
+</main>
