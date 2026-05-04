@@ -1,25 +1,23 @@
 import re
-
 from app.core.category_resolver import ResultTuple, procedural_resolver
 from app.model.inventory_details import InventoryDetails
 from app.model.inventory_entry import InventoryEntry as IE
 from app.model.branch import Branch as Br
 from app.model.pawn_type import PawnType as PT
 from app.model.carat_rating import CaratRating as CR
-
 from typing import Optional
 from sqlmodel import Session, func, select, and_
 
 class InventoryService:
     rds: Session
 
-    def __query(self, branch_id: str, item_id: Optional[str] = None):
+    def __query(self, branch_id: str, barcode: Optional[str] = None):
         conditions = [
             c
             for c in [
                 IE.cantidad >= 1,
                 IE.sucursalDestino == branch_id,
-                (IE.codigo == item_id) if item_id is not None else None,
+                (IE.codigo == barcode) if barcode is not None else None,
             ]
             if c is not None
         ]
@@ -113,19 +111,7 @@ class InventoryService:
     def __init__(self, rds: Session):
         self.rds = rds
 
-    def get_items_by_branch(
-        self, branch_id: str, limit: int, page: int, query: Optional[str] = None
-    ):
-        offset = max(0, page - 1) * limit
-        stmt = self.__query(branch_id).limit(limit).offset(offset)
-        result = self.rds.exec(stmt).all()
-        return [self.__to_details(r) for r in result]
-    
-    def get_count_by_branch(self, branch_id: str):
-        result = self.rds.exec(self.__count(branch_id)).one()
-        return result
-
-    def get_item_by_id(self, branch_id: str, item_id: str):
-        query = self.__query(branch_id, item_id)
-        result = self.rds.exec(query).one()
+    def get_by_barcode(self, branch_id: str, query: str):
+        stmt = self.__query(branch_id, query)
+        result = self.rds.exec(stmt).one()
         return self.__to_details(result)
