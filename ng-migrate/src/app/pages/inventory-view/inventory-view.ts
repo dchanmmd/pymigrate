@@ -1,167 +1,56 @@
+import { httpResource } from "@angular/common/http";
 import { Component, computed, inject, signal, Signal, viewChild, WritableSignal } from "@angular/core";
-import { Header } from "@components/header/header";
 import { ActivatedRoute } from "@angular/router";
+import { Spinner } from "@app/components/spinner/spinner";
+import { InventoryItem } from "@common/interface/inventory-item.interface";
+import { ItemResponse } from "@common/interface/item-response.interface";
+import { Dialog } from "@components/dialog/dialog";
+import { Header } from "@components/header/header";
+import { environment } from "@environments/environment";
+import { Tooltip } from "@components/tooltip/tooltip";
 import { toObservable, toSignal } from "@angular/core/rxjs-interop";
-import { BranchService } from "../branch-view/branch.service";
-import { combineLatest, debounceTime, distinctUntilChanged, filter, map, startWith, Subject, switchMap, tap } from "rxjs";
-import { Branch } from "@app/common/interface/branch.interface";
-import { InventoryItem } from "@app/common/interface/inventory-item.interface";
-import { InventoryService } from "./inventory.service";
-import { toMMDTitle } from "@app/common/lib/functions";
-import { FormsModule } from "@angular/forms";
-import { Badge } from "@app/components/badge/badge";
-import { Dialog } from "@app/components/dialog/dialog";
+import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
     selector: "app-inventory-view",
-    imports: [Header, FormsModule, Badge, Dialog],
+    imports: [Header, Dialog, Spinner, Tooltip],
     templateUrl: "./inventory-view.html"
 })
 export class InventoryView {
-    private readonly branchService = inject(BranchService);
-    private readonly inventoryService = inject(InventoryService);
-
-    private readonly activatedRoute = inject(ActivatedRoute);
-
-    private readonly pageSize: number = 10;
-
-    public page: WritableSignal<number> = signal(1);
-    public count: WritableSignal<number> = signal(1);
+    public activatedRoute = inject(ActivatedRoute);
+    public reloading: WritableSignal<boolean> = signal(false);
+    public branchId: string = this.activatedRoute.snapshot.paramMap.get("id") ?? "";
+    public dialog: Signal<Dialog> = viewChild.required(Dialog);
     public query: WritableSignal<string> = signal("");
+    public debouncedQuery = toSignal(
+        toObservable(this.query).pipe(
+            debounceTime(500),
+            distinctUntilChanged()
+        ),
+        { initialValue: "" }
+    );
 
-    public dialog = viewChild.required(Dialog);
-    public dialogMode: WritableSignal<"detail" | "confirm"> = signal("detail");
-    public selectedItem: WritableSignal<InventoryItem | null> = signal(null);
+    public response = httpResource<ItemResponse<InventoryItem>>(() => {
+        const url = new URL(`/api/v1/${this.branchId}`, environment.apiUrl);
+        url.searchParams.set("query", this.debouncedQuery().trim());
+        return url.toString();
+    });
 
-    public page$ = toObservable(this.page);
-    public query$ = toObservable(this.query).pipe(debounceTime(300), distinctUntilChanged(), tap(() => this.page.set(1)));
-    public refresh$ = new Subject<void>();
+    public item: Signal<InventoryItem | undefined> = computed(() => this.response.value()?.data);
 
-    public selectedBarcodes: WritableSignal<Set<string>> = signal(new Set());
-
-    public toMoney(num: number): string {
-        const fixed = num.toFixed(2);
-        const [integer, decimal] = fixed.split(".");
-        const fragments = [];
-
-        for (let i = integer.length; i > 0; i -= 3) {
-            fragments.unshift(integer.slice(Math.max(0, i - 3), i));
-        }
-
-        return `${fragments.join(",")}.${decimal}`;
+    public reload() {
+        this.reloading.set(true);
+        this.response.reload();
+        setTimeout(() => {
+            this.reloading.set(false);
+        }, 500);
     }
 
-    private readonly branchId = this.activatedRoute.paramMap.pipe(
-        map(params => params.get("id") ?? ""),
-        filter(Boolean)
-    );
+    public setQuery(event: Event): void {
+        this.query.set((event.currentTarget as HTMLInputElement).value);
+    }
 
-    public readonly branch: Signal<Branch | undefined> = toSignal(
-        this.branchId.pipe(
-            switchMap(id => this.branchService.fetchBranch(id)),
-            map(r => ({ id: r.data.id, name: toMMDTitle(r.data.name) }))
-        )
-    );
-
-    public readonly inventory: Signal<Array<InventoryItem> | undefined> = toSignal(
-        this.branchId.pipe(
-            switchMap(branchId =>
-                combineLatest([this.query$, this.page$, this.refresh$.pipe(startWith(null))]).pipe(
-                    switchMap(([query, page]) =>
-                        this.inventoryService.fetchInventory(branchId, page, query)
-                    ),
-                    tap(r => this.count.set(r.metadata?.["count"] || 0)),
-                    map(r => r.data)
-                )
-            )
-        )
-    );
-
-    public clearSearchBar() {
+    public clearQuery(): void {
         this.query.set("");
-        this.page.set(1);
     }
-
-    public nextPage() {
-        this.page.update(p => Math.min(Math.ceil(this.count() / this.pageSize), p + 1));
-    }
-
-    public prevPage() {
-        this.page.update(p => Math.max(1, p - 1));
-    }
-
-    public refresh() {
-        this.refresh$.next();
-    }
-
-    public openDetail(item: InventoryItem) {
-        this.selectedItem.set(item);
-        this.dialogMode.set("detail");
-        this.dialog().show();
-    }
-
-    public openConfirm() {
-        if (!this.selectedCount()) return;
-        this.selectedItem.set(null);
-        this.dialogMode.set("confirm");
-        this.dialog().show();
-    }
-
-    public isSelected(barcode: string): boolean {
-        return this.selectedBarcodes().has(barcode);
-    }
-
-    public toggleItem(barcode: string) {
-        this.selectedBarcodes.update(set => {
-            const next = new Set(set);
-            next.has(barcode) ? next.delete(barcode) : next.add(barcode);
-            return next;
-        });
-    }
-
-
-    public toggleAndClose(barcode: string) {
-        this.toggleItem(barcode);
-        this.dialog().close();
-    }
-
-    public isAllSelected(): boolean {
-        const items = this.inventory();
-        return !!items?.length && items.every(i => this.selectedBarcodes().has(i.barcode));
-    }
-
-    public toggleAll() {
-        const items = this.inventory() ?? [];
-        if (this.isAllSelected()) {
-            this.selectedBarcodes.update(set => {
-                const next = new Set(set);
-                items.forEach(i => next.delete(i.barcode));
-                return next;
-            });
-        } else {
-            this.selectedBarcodes.update(set => {
-                const next = new Set(set);
-                items.forEach(i => next.add(i.barcode));
-                return next;
-            });
-        }
-    }
-
-    public onFormSubmit(event: SubmitEvent) {
-        event.preventDefault();
-        if (!this.selectedCount()) return;
-        this.inventoryService.sendSelection(Array.from(this.selectedBarcodes())).subscribe({
-            next: () => {
-
-            },
-            complete: () => {
-                this.dialog().close();
-            }
-        });
-    }
-
-    public readonly totalPages = computed(() => Math.ceil(this.count() / this.pageSize));
-    public readonly hasNextPage = computed(() => this.page() < this.totalPages());
-    public readonly hasPrevPage = computed(() => this.page() > 1);
-    public readonly selectedCount = computed(() => this.selectedBarcodes().size);
 }

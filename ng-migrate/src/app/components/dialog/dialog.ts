@@ -1,23 +1,24 @@
-import { Component, input, InputSignal, signal, WritableSignal } from "@angular/core";
+import { Component, signal, WritableSignal } from "@angular/core"; 
 
-@Component({
-    selector: "app-dialog",
-    imports: [],
-    templateUrl: "./dialog.html"
-})
-export class Dialog {
-    public open: WritableSignal<boolean> = signal(false);
-    public modal: InputSignal<boolean> = input(false);
-
-    public closeNonModal() {
-        if (!this.modal()) this.open.set(false);
-    }
-
-    public show() {
+@Component({ 
+    selector: "app-dialog", 
+    imports: [], 
+    templateUrl: "./dialog.html",
+    styleUrl: "./dialog.css"
+}) 
+export class Dialog { 
+    public open: WritableSignal<boolean> = signal(false); 
+    public displayed: WritableSignal<boolean> = signal(false); 
+    
+    public show(): void { 
         this.open.set(true);
-    }
+        requestAnimationFrame(() => this.displayed.set(true));
+    } 
 
-    public close() {
-        this.open.set(false);
-    }
+    public hide(): void { 
+        this.displayed.set(false); 
+        setTimeout(() => { 
+            this.open.set(false); 
+        }, 300); 
+    } 
 }

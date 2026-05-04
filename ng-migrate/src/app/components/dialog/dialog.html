@@ -1,13 +1,14 @@
 @if (open()) {
-    <div role="button" class="fixed inset-0 z-50 flex justify-center items-center backdrop-brightness-50 backdrop-blur-xs"
-        (click)="closeNonModal()">
-        <div class="relative p-4 rounded-lg bg-white min-w-lg w-full max-w-2xl" (click)="$event.stopPropagation()">
-            @if (!modal()) {
-                <button class="absolute top-4 right-4" aria-label="Cerrar diálogo" (click)="close()">
-                    <i class="bi bi-x-lg text-neutral-400"></i>
-                </button>
-            }
+<div role="button" (click)="hide()" class="fixed inset-0 z-50 backdrop-brightness-50 backdrop-blur-xs">
+    <div (click)="$event.stopPropagation()" [class]="`dialog w-full h-full flex justify-center items-center ${displayed() ? 'open' : ''}`">
+        <div role="dialog"
+            class="relative p-4 rounded-lg bg-white shadow-sm shadow-neutral-500 min-w-lg max-w-2xl max-h-200">
+            <button type="button" (click)="hide()" aria-label="Cerrar diálogo"
+                class="text-neutral-400 absolute top-2 right-2">
+                <i class="bi bi-x-lg"></i>
+            </button>
             <ng-content />
         </div>
     </div>
+</div>
 }

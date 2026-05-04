@@ -3,3 +3,16 @@
 button, a, input[type="submit"], input[type="reset"] {
     cursor: pointer;
 }
+
+@utility spin {
+    animation: spin 500ms linear infinite;
+}
+
+@keyframes spin {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        roate: 360deg;
+    }
+}

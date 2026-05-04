@@ -1,0 +1,10 @@
+.dialog { 
+    opacity: 0; 
+    transform: translateY(-10%); 
+    transition: opacity 300ms ease, transform 300ms ease; 
+} 
+
+.dialog.open { 
+    opacity: 1; 
+    transform: translateY(0); 
+}

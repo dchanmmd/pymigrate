@@ -1,0 +1,136 @@
+:host {
+    --bg: black;
+    --text: white;
+    --offset: 0.25rem;
+    --caret-size: 0.375rem;
+    --caret-offset: 1px;
+    --delay: 300ms;
+    --slide: 0.5rem;
+}
+
+.tooltip:not([data-tip=""]) {
+    position: relative;
+}
+
+.tooltip:not([data-tip=""])::before {
+    content: attr(data-tip);
+    position: absolute;
+    padding-block: 0.125rem;
+    padding-inline: 0.5rem;
+    color: var(--text);
+    background-color: var(--bg);
+    border-radius: 0.25rem;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    transition: opacity var(--delay) ease, transform var(--delay) ease;
+}
+
+.tooltip:not([data-tip=""]):hover::before,
+.tooltip:not([data-tip=""]):focus-visible::before {
+    opacity: 1;
+}
+
+.tooltip:not([data-tip=""])::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    transition: opacity var(--delay) ease, transform var(--delay) ease;
+}
+
+.tooltip:not([data-tip=""]):hover::after,
+.tooltip:not([data-tip=""]):focus-visible::after {
+    opacity: 1;
+}
+
+.tooltip.top:not([data-tip=""])::before {
+    bottom: calc(100% + var(--caret-size) + var(--offset));
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--slide));
+}
+
+.tooltip.bottom:not([data-tip=""])::before {
+    top: calc(100% + var(--caret-size) + var(--offset));
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(var(--slide) * -1));
+}
+
+.tooltip.left:not([data-tip=""])::before {
+    right: calc(100% + var(--caret-size) + var(--offset));
+    top: 50%;
+    transform: translateX(var(--slide)) translateY(-50%);
+}
+
+.tooltip.right:not([data-tip=""])::before {
+    left: calc(100% + var(--caret-size) + var(--offset));
+    top: 50%;
+    transform: translateX(calc(var(--slide) * -1)) translateY(-50%);
+}
+
+.tooltip.top:not([data-tip=""]):hover::before,
+.tooltip.top:not([data-tip=""]):focus-visible::before,
+.tooltip.bottom:not([data-tip=""]):hover::before,
+.tooltip.bottom:not([data-tip=""]):focus-visible::before {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip.left:not([data-tip=""]):hover::before,
+.tooltip.left:not([data-tip=""]):focus-visible::before,
+.tooltip.right:not([data-tip=""]):hover::before,
+.tooltip.right:not([data-tip=""]):focus-visible::before {
+    transform: translateX(0) translateY(-50%);
+}
+
+
+.tooltip.top:not([data-tip=""])::after {
+    border-left: var(--caret-size) solid transparent;
+    border-right: var(--caret-size) solid transparent;
+    border-top: var(--caret-size) solid var(--bg);
+    bottom: calc(100% + var(--caret-size) - var(--caret-offset));
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--slide));
+}
+
+.tooltip.bottom:not([data-tip=""])::after {
+    border-left: var(--caret-size) solid transparent;
+    border-right: var(--caret-size) solid transparent;
+    border-bottom: var(--caret-size) solid var(--bg);
+    top: calc(100% + var(--caret-size) - var(--caret-offset));
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(var(--slide) * -1));
+}
+
+.tooltip.left:not([data-tip=""])::after {
+    border-top: var(--caret-size) solid transparent;
+    border-bottom: var(--caret-size) solid transparent;
+    border-left: var(--caret-size) solid var(--bg);
+    right: calc(100% + var(--caret-size) - var(--caret-offset));
+    top: 50%;
+    transform: translateX(var(--slide)) translateY(-50%);
+}
+
+.tooltip.right:not([data-tip=""])::after {
+    border-top: var(--caret-size) solid transparent;
+    border-bottom: var(--caret-size) solid transparent;
+    border-right: var(--caret-size) solid var(--bg);
+    left: calc(100% + var(--caret-size) - var(--caret-offset));
+    top: 50%;
+    transform: translateX(calc(var(--slide) * -1)) translateY(-50%);
+}
+
+
+.tooltip.top:not([data-tip=""]):hover::after,
+.tooltip.top:not([data-tip=""]):focus-visible::after,
+.tooltip.bottom:not([data-tip=""]):hover::after,
+.tooltip.bottom:not([data-tip=""]):focus-visible::after {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip.left:not([data-tip=""]):hover::after,
+.tooltip.left:not([data-tip=""]):focus-visible::after,
+.tooltip.right:not([data-tip=""]):hover::after,
+.tooltip.right:not([data-tip=""]):focus-visible::after {
+    transform: translateX(0) translateY(-50%);
+}

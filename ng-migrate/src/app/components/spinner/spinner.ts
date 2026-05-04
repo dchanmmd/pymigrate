@@ -7,4 +7,5 @@ import { Component, input, InputSignal } from "@angular/core";
 })
 export class Spinner {
     public size: InputSignal<number> = input(36);
+    public fill: InputSignal<string> = input("fill-indigo-500");
 }
