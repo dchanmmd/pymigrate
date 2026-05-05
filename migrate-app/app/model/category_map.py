@@ -1,14 +1,13 @@
-from app.db.metadata import pg_metadata
 from typing import Optional
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.postgres import Postgres
 
-from sqlmodel import Field, SQLModel
-
-class CategoryMap(SQLModel, table=True):
+class CategoryMap(Postgres):
     __tablename__ = 'odoo_product_category_map'
-    metadata = pg_metadata
 
-    id: int = Field(primary_key=True)
-    category: str = Field(nullable=False)
-    kilataje: Optional[str] = Field(default=None)
-    palabra_clave: str = Field(nullable=False)
-    categoria_odoo: str = Field(nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    category: Mapped[str] = mapped_column(String, nullable=False)
+    kilataje: Mapped[Optional[str]] = mapped_column(String, default=None)
+    palabra_clave: Mapped[str] = mapped_column(String, nullable=False)
+    categoria_odoo: Mapped[str] = mapped_column(String, nullable=False)

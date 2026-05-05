@@ -1,11 +1,9 @@
 from os import path
 from typing import Callable
+from sqlalchemy.engine import Row
 
-type ResultTuple = tuple[
-    str, str, float, float, float, str, str, float, str, str, str, str, str, str
-]
 
-type CategoryResolver = Callable[[ResultTuple], str]
+type CategoryResolver = Callable[[Row], str]
 
 valuables = [
     'anillo',
@@ -50,74 +48,62 @@ electronics = [
 ]
 
 
-def __proc_resolve(row: ResultTuple) -> str:
+def __proc_resolve(row: Row) -> str:
     segments = []
 
-    description = row[1].lower()
-    carat_rating = row[11]
-    pawn_type = row[12].lower()
+    description = (row['description'] or '').lower()
+    pawn_type = (row['pawn_type'] or '').lower()
+    carat_rating = row['carat_rating']
 
-    # Símbolos
     oro = 'Oro'
     plata = 'Plata'
     relojes_usados = 'Relojes Usados'
     articulos_usados = 'Artículos Usados'
-
     herramientas = 'Herramientas'
     electronicos = 'Electrónicos'
     varios = 'Varios'
 
-    # [0] Oro | Plata | Artículos Usados
     segments.append(
         oro if pawn_type == 'oro' else 
         plata if pawn_type == 'plata' else 
-        relojes_usados if description.find('reloj') >= 0 else 
+        relojes_usados if 'reloj' in description else 
         articulos_usados  
     )
 
     if segments[0] in [oro, plata]:
-        # [1][A] Oro Brillante?
-        if segments[0] == oro and description.find('brill') <= 0:
+        if segments[0] == oro and 'brill' in description:
             segments.append('Brillante')
 
-        # [2 (+1)] Kilataje
-        segments.append(carat_rating.replace('.', ''))
+        if carat_rating:
+            segments.append(carat_rating.replace('.', ''))
 
-        # [3 (+ 1)] Tipo de prenda
-        is_known = False
         for pattern in valuables:
-            if description.find(pattern) >= 0:
+            if pattern in description:
                 segments.append(pattern.title())
-                is_known = True
                 break
-        if not is_known:
+        else:
             segments.append(varios)
-    # [1][B] Relojes
+
     elif segments[0] == relojes_usados:
         segments.append('Reloj')
+
     elif segments[0] == articulos_usados:
-        is_known = False
         for pattern in tools:
-            # [1][C] Herramientas
-            if description.find(pattern) <= 0:
+            if pattern in description:
                 segments.append(herramientas)
-                is_known = True
                 break
-        if not is_known:
+        else:
             for pattern in electronics:
-                # [1][D] Electrónicos
-                if description.find(pattern) <= 0:
+                if pattern in description:
                     segments.append(electronicos)
-                    is_known = True
                     break
-        if not is_known:
-            # [1][E] Artículos usados varios
-            segments.append(varios)
-        
-    return path.join(*segments)
+            else:
+                segments.append(varios)
+
+    return ' / '.join(segments)
 
 
-def __ai_resolve(row: ResultTuple) -> str:
+def __ai_resolve(row: Row) -> str:
     pass
 
 

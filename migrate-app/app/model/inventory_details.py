@@ -1,8 +1,7 @@
 from typing import Optional
+from pydantic import BaseModel
 
-from sqlmodel import SQLModel
-
-class InventoryDetails(SQLModel):
+class InventoryDetails(BaseModel):
     internal_ref: Optional[str]
     barcode: Optional[str]
     name: Optional[str]

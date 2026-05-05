@@ -1,21 +1,25 @@
 import re
-from app.core.category_resolver import ResultTuple, procedural_resolver
+from typing import Optional
+from sqlalchemy import select
+from sqlalchemy.engine import Row
+from sqlalchemy.orm import Session
+from app.core.category_resolver import procedural_resolver
 from app.model.inventory_details import InventoryDetails
 from app.model.inventory_entry import InventoryEntry as IE
 from app.model.branch import Branch as Br
 from app.model.pawn_type import PawnType as PT
 from app.model.carat_rating import CaratRating as CR
-from typing import Optional
-from sqlmodel import Session, col, select, and_
-
 
 class InventoryService:
-    rds: Session
+    my: Session
 
-    def __query(self, branch_id: str, barcode: Optional[str] = None):
+    def __init__(self, my: Session):
+        self.my = my
+
+    def __stmt(self, branch_id: str, barcode: Optional[str] = None):
         conditions = [c for c in [
             IE.cantidad >= 1,
-            col(Br.id).in_([826, 832, 840, 841, 852, 857, 869, 876, 885, 888, 891]),
+            Br.id.in_([826, 832, 840, 841, 852, 857, 869, 876, 885, 888, 891]),
             IE.sucursalDestino >= 803,
             IE.sucursalDestino == branch_id,
             (IE.codigo == barcode) if barcode is not None else None,
@@ -23,97 +27,89 @@ class InventoryService:
 
         return (
             select(
-                IE.codigo,
-                IE.descripcion,
-                IE.pesoDotacion,
-                IE.precio,
-                IE.costo,
-                IE.observaciones,
-                IE.idEmpeno,
-                IE.pesoPiedras,
-                IE.marca,
-                IE.modelo,
-                IE.serie,
-                CR.nombreKilataje,
-                PT.nombreTipoEmpeno,
-                Br.nombreComercial,
+                IE.codigo.label('barcode'),
+                IE.descripcion.label('description'),
+                IE.pesoDotacion.label('weight'),
+                IE.precio.label('retail_price'),
+                IE.costo.label('cost'),
+                IE.observaciones.label('observations'),
+                IE.idEmpeno.label('pawn_no'),
+                IE.pesoPiedras.label('stone_weight'),
+                IE.marca.label('brand'),
+                IE.modelo.label('model'),
+                IE.serie.label('series'),
+                CR.nombreKilataje.label('carat_rating'),
+                PT.nombreTipoEmpeno.label('pawn_type'),
+                Br.nombreComercial.label('branch'),
             )
             .join(Br, IE.sucursalDestino == Br.id)
             .join(PT, IE.tipoDotacion == PT.idTipoEmpeno)
             .join(CR, IE.kilates == CR.Clave)
-            .where(and_(*conditions))
+            .where(*conditions)
             .order_by(IE.id_entrada_inventario.desc())
         )
+    
+    def __details_resolve_name(self, row: Row) -> str | None:
+        description = row['description']
+        carat_rating = row['carat_rating']
+        weight = row['weight']
+        pawn_type = row['pawn_type']
+        observations = row['observations']
+        barcode = row['barcode']
 
-    def __details_resolve_name(self, row: ResultTuple) -> str | None:
-        description = row[1]
-        carat_rating = row[11]
-        weight = row[2]
-        pawn_type = row[12]
-        observations = row[5]
-        barcode = row[0]
-
-        return (
-            ' '.join(
-                w
-                for w in [
-                    ' '.join(
-                        [
-                            w
-                            for w in [
-                                description.strip().title(),
-                                carat_rating.strip(),
-                                f'{weight}grs.' if weight > 0 else None,
-                            ]
-                            if bool(w)
-                        ]
-                    ),
-                    '-'.join(
-                        [w.strip() for w in [pawn_type, observations, barcode] if w]
-                    ).lower(),
-                ]
-                if w
-            )
-            or None
+        main = ' '.join(
+            w for w in [
+                (description.strip().title() if description else None),
+                (carat_rating.strip() if carat_rating else None),
+                (f'{weight}grs.' if weight and weight > 0 else None),
+            ]
+            if w
         )
 
-    def __details_resolve_category(self, row: ResultTuple) -> str:
+        suffix = '-'.join(
+            w.strip() for w in [pawn_type, observations, barcode] if w
+        ).lower()
+
+        result = ' '.join(w for w in [main, suffix] if w)
+        return result or None
+    
+    def __details_resolve_category(row: Row) -> str:
         return procedural_resolver(row)
 
-    def __to_details(self, row: ResultTuple) -> InventoryDetails:
+    def __details_resolve_branch(branch: Optional[str]) -> str:
+        return '' if not branch else ' '.join(branch.replace('MASMEDAN', '').split())
+
+    def __to_details(self, row: Row) -> InventoryDetails:
         return InventoryDetails(
-            internal_ref=row[0],
-            barcode=row[0],
+            internal_ref=row['barcode'],
+            barcode=row['barcode'],
             name=self.__details_resolve_name(row),
-            description=row[1],
+            description=row['description'],
             uom='Unidades',
             purchase_uom='Unidades',
-            weight=row[2],
-            carat_rating=row[11],
+            weight=row['weight'],
+            carat_rating=row['carat_rating'],
             can_be_sold=True,
             can_be_bought=False,
             product_type='Producto almacenable',
             provider_tax='ITBMS',
             customer_tax='ITBMS',
             tags='Lógica de etiquetas',
-            retail_price=row[3],
-            cost=row[4],
-            observations=row[5],
-            pawn_no=row[6],
-            stone_weight=row[7],
-            brand=row[8],
-            model=row[9],
-            series=row[10],
-            branch=re.sub(r'\s+', ' ', row[13].replace('MASMEDAN', '')).strip(),
+            retail_price=row['retail_price'],
+            cost=row['cost'],
+            observations=row['observations'],
+            pawn_no=row['pawn_no'],
+            stone_weight=row['stone_weight'],
+            brand=row['brand'],
+            model=row['model'],
+            series=row['series'],
+            branch=self.__details_resolve_branch(row['branch']),
             product_category=self.__details_resolve_category(row),
         )
-
-    def __init__(self, rds: Session):
-        self.rds = rds
-
-    def get_by_barcode(self, branch_id: str, query: str):
-        stmt = self.__query(branch_id, query)
-        result = self.rds.exec(stmt).one_or_none()
+    
+    def get_by_barcode(self, branch_id: str, query: str) -> InventoryDetails | None:
+        stmt = self.__stmt(branch_id, query)
+        result = self.my.exec(stmt).first()
         if result is None:
-            return result
+            return None
         return self.__to_details(result) 

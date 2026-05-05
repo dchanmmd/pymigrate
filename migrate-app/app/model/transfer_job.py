@@ -1,20 +1,24 @@
-from app.db.metadata import pg_metadata
+from datetime import datetime, timezone
+from typing import Optional
+import uuid
+
+from sqlalchemy import UUID, DateTime, Enum, Index, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.postgres import Postgres
 from app.model.job_result import JobResult
 from app.model.job_status import JobStatus
-from datetime import datetime, timezone
-from sqlmodel import Column, Enum
-from uuid import uuid4
 
-from sqlmodel import Field, SQLModel
-
-class TransferJob(SQLModel, table=True):
-    metadata = pg_metadata
+class TransferJob(Postgres):
     __tablename__ = 'transfer_jobs'
-    job_id: str = Field(default_factory= lambda: str(uuid4()), primary_key=True)
-    status: JobStatus = Field(sa_column=Column(Enum(JobStatus, name='job_status'), default=JobStatus.Pending, nullable=False))
-    result: JobResult | None = Field(sa_column=Column(Enum(JobResult, name='job_result'), nullable=True))
-    pushed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    shifted_at: datetime | None = None
-    completed_at: datetime | None = None
-    retries: int = Field(default=0)
-    error: str | None = None
+    __table_args__ = (Index('idx_jobs_status_pushed_at', 'status', 'pushed_at'),)
+
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String, default='', nullable=False)
+    status: Mapped[JobStatus] = mapped_column(Enum(JobStatus, name='job_status'), default=JobStatus.Pending, nullable=False)
+    result: Mapped[Optional[JobResult]] = mapped_column(Enum(JobResult, name='job_result'), nullable=True)
+    pushed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    shifted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    tries: Mapped[int] = mapped_column(Integer, default=0)
+    error: Mapped[Optional[str]] = mapped_column(String, nullable=True)

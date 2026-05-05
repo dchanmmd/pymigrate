@@ -1,39 +1,47 @@
-from app.db.metadata import pg_metadata
-from app.config.settings import get_settings
-from typing import Annotated
+from typing import Annotated, Generator
+
 from fastapi import Depends
-from sqlmodel import SQLModel, Session, create_engine
+
+from app.db.postgres import Postgres
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
+from app.config.settings import get_settings
 
 settings = get_settings()
 
-pg_engine = create_engine(url=settings.pg_url)
+pg_engine = create_engine(settings.pg_url, future=True)
+my_engine = create_engine(settings.rds_url, future=True)
 
-def create_pg():
+
+def create_postgres():
     from app.model.category_map import CategoryMap
     from app.model.transfer_job import TransferJob
     from app.model.transfer_job_item import TransferJobItem
-    pg_metadata.create_all(pg_engine)
 
-def get_pg_session():
-    with Session(pg_engine) as session:
-        try:
-            yield session
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
+    Postgres.metadata.create_all(pg_engine)
+
+def get_pg_session() -> Generator[Session, None, None]:
+    session = Session(pg_engine)
+    try: 
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+def get_my_session() -> Generator[Session, None, None]:
+    session = Session(my_engine)
+    try: 
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 RequiresPostgres = Annotated[Session, Depends(get_pg_session)]
-
-rds_engine = create_engine(url=settings.rds_url)
-
-def get_rds_session():
-    with Session(rds_engine) as session:
-        try:
-            yield session
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
-
-RequiresRDS = Annotated[Session, Depends(get_rds_session)]
+RequiresMySQL= Annotated[Session, Depends(get_my_session)]

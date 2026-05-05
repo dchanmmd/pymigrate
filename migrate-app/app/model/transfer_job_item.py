@@ -1,12 +1,14 @@
-from app.db.metadata import pg_metadata
+import uuid
+from sqlalchemy import UUID, Index, String, ForeignKey, Enum
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.postgres import Postgres
 from app.model.item_result import ItemResult
-from sqlmodel import Enum, Field, SQLModel
-from uuid import uuid4
 
-class TransferJobItem(SQLModel, table=True):
-    metadata = pg_metadata
+class TransferJobItem(Postgres):
     __tablename__ = 'transfer_job_items'
-    item_id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
-    job_id: str = Field(foreign_key='transfer_jobs.job_id')
-    row_id: str = Field()
-    result: ItemResult = Field(default=ItemResult.Pending, sa_column=Enum(ItemResult, name='item_result'))
+    __table_args__ = (Index('idx_items_job_id_result', 'job_id', 'result'),)
+
+    item_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    job_id: Mapped[str] = mapped_column(String, ForeignKey('transfer_jobs.job_id'), nullable=False)
+    row_id: Mapped[str] = mapped_column(String, nullable=False)
+    result: Mapped[ItemResult] = mapped_column(Enum(ItemResult, name='item_result'), default=ItemResult.Pending, nullable=False)

@@ -1,23 +1,22 @@
 from datetime import datetime
 from typing import Optional
-from app.db.metadata import rds_metadata
-from sqlmodel import SQLModel, Field
+from sqlalchemy import Float, Integer, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.mysql import MySQL
 
-
-class CaratRating(SQLModel, table=True):
-    metadata = rds_metadata
+class CaratRating(MySQL):
     __tablename__ = 'app_kilatajes'
 
-    idKilataje: int = Field(primary_key=True)
-    Clave: Optional[int] = Field(default=None)
-    nombreKilataje: Optional[str] = Field(default=None)
-    idTipoEmpeno: Optional[int] = Field(default=None)
-    IDTablaTipo: Optional[int] = Field(default=None)
-    valorxGramo: Optional[float] = Field(default=None)
-    Ordenamiento: Optional[int] = Field(default=None)
-    IDOrigen: Optional[int] = Field(default=None)
-    FechaModificacion: Optional[datetime] = Field(default=None)
-    Actualizar: Optional[int] = Field(default=None)
-    estado: Optional[int] = Field(default=None)
-    created_at: Optional[datetime] = Field(default=None)
-    updated_at: Optional[datetime] = Field(default=None)
+    idKilataje: Mapped[int] = mapped_column(Integer, primary_key=True)
+    Clave: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    nombreKilataje: Mapped[Optional[str]] = mapped_column(String, default=None)
+    idTipoEmpeno: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    IDTablaTipo: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    valorxGramo: Mapped[Optional[float]] = mapped_column(Float, default=None)
+    Ordenamiento: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    IDOrigen: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    FechaModificacion: Mapped[Optional[datetime]] = mapped_column(DateTime, default=None)
+    Actualizar: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    estado: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=None)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=None)

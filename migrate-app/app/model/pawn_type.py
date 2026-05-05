@@ -1,20 +1,21 @@
 from datetime import datetime
-from app.db.metadata import rds_metadata
-from sqlmodel import Field, SQLModel
+from typing import Optional
+from sqlalchemy import DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.mysql import MySQL
 
-class PawnType(SQLModel, table=True):
-    metadata = rds_metadata
+class PawnType(MySQL):
     __tablename__ = 'app_tipoempeno'
     
-    idTipoEmpeno: int = Field(primary_key=True)
-    nombreTipoEmpeno: str = Field(default=None)
-    kilataje: int = Field(default=None)
-    pesoTipo: int = Field(default=None)
-    ordenamiento: int = Field(default=None)
-    vencimiento: int = Field(default=None)
-    IDOrigen: int = Field(default=None)
-    fecha: datetime = Field(default=None)
-    actualizar: int = Field(default=None)
-    estado: int = Field(default=None)
-    created_at: datetime = Field(default=None)
-    updated_at: datetime = Field(default=None)
+    idTipoEmpeno: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True)
+    nombreTipoEmpeno: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    kilataje: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    pesoTipo: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    ordenamiento: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    vencimiento: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    IDOrigen: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    fecha: Mapped[Optional[datetime]] = mapped_column()
+    actualizar: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    estado: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

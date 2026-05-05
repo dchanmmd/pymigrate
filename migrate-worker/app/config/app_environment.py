@@ -18,7 +18,10 @@ class AppEnvironment(Environment):
     ODOO_USER: str 
     ODOO_PASSWORD: str 
     ODOO_URL: str 
-    ODOO_DB: str 
+    ODOO_DB: str
+
+    BATCH_LIMIT: int = 10
+    MAX_RETRIES: int = 3
 
     @property
     def pg_url(self):

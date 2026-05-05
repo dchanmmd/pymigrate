@@ -1,13 +1,13 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.db.session import RequiresRDS
+from app.db.session import RequiresMySQL
 from app.model.inventory_details import InventoryDetails
 from app.schema.response.item_response import ItemResponse
 from app.schema.response.list_response import ListResponse
 from app.service.inventory_service import InventoryService
 
-def __get_service(rds: RequiresRDS):
+def __get_service(rds: RequiresMySQL):
     return InventoryService(rds)
 
 RequiresInventoryService = Annotated[InventoryService, Depends(__get_service)]
