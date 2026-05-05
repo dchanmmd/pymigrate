@@ -15,7 +15,7 @@ class BranchService:
 
     @staticmethod
     def __to_simple(row: Row) -> SimpleBranch:
-        return SimpleBranch(id=row['id'], name=row['name'])
+        return SimpleBranch(id=row.id, name=row.name)
 
     def get_list(self) -> list[SimpleBranch]:
         stmt = self.__select.where(Branch.grupo == self.__mmd_si)

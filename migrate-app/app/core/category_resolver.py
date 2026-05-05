@@ -51,9 +51,9 @@ electronics = [
 def __proc_resolve(row: Row) -> str:
     segments = []
 
-    description = (row['description'] or '').lower()
-    pawn_type = (row['pawn_type'] or '').lower()
-    carat_rating = row['carat_rating']
+    description = (row.description or '').lower()
+    pawn_type = (row.pawn_type or '').lower()
+    carat_rating = row.carat_rating
 
     oro = 'Oro'
     plata = 'Plata'

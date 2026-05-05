@@ -50,12 +50,12 @@ class InventoryService:
         )
     
     def __details_resolve_name(self, row: Row) -> str | None:
-        description = row['description']
-        carat_rating = row['carat_rating']
-        weight = row['weight']
-        pawn_type = row['pawn_type']
-        observations = row['observations']
-        barcode = row['barcode']
+        description = row.description
+        carat_rating = row.carat_rating
+        weight = row.weight
+        pawn_type = row.pawn_type
+        observations = row.observations
+        barcode = row.barcode
 
         main = ' '.join(
             w for w in [
@@ -73,43 +73,46 @@ class InventoryService:
         result = ' '.join(w for w in [main, suffix] if w)
         return result or None
     
+    @staticmethod
     def __details_resolve_category(row: Row) -> str:
         return procedural_resolver(row)
-
+    
+    @staticmethod
     def __details_resolve_branch(branch: Optional[str]) -> str:
         return '' if not branch else ' '.join(branch.replace('MASMEDAN', '').split())
+    
 
     def __to_details(self, row: Row) -> InventoryDetails:
         return InventoryDetails(
-            internal_ref=row['barcode'],
-            barcode=row['barcode'],
+            internal_ref=row.barcode,
+            barcode=row.barcode,
             name=self.__details_resolve_name(row),
-            description=row['description'],
+            description=row.description,
             uom='Unidades',
             purchase_uom='Unidades',
-            weight=row['weight'],
-            carat_rating=row['carat_rating'],
+            weight=row.weight,
+            carat_rating=row.carat_rating,
             can_be_sold=True,
             can_be_bought=False,
             product_type='Producto almacenable',
             provider_tax='ITBMS',
             customer_tax='ITBMS',
             tags='Lógica de etiquetas',
-            retail_price=row['retail_price'],
-            cost=row['cost'],
-            observations=row['observations'],
-            pawn_no=row['pawn_no'],
-            stone_weight=row['stone_weight'],
-            brand=row['brand'],
-            model=row['model'],
-            series=row['series'],
-            branch=self.__details_resolve_branch(row['branch']),
+            retail_price=row.retail_price,
+            cost=row.cost,
+            observations=row.observations,
+            pawn_no=row.pawn_no,
+            stone_weight=row.stone_weight,
+            brand=row.brand,
+            model=row.model,
+            series=row.series,
+            branch=self.__details_resolve_branch(row.branch),
             product_category=self.__details_resolve_category(row),
         )
-    
+      
     def get_by_barcode(self, branch_id: str, query: str) -> InventoryDetails | None:
         stmt = self.__stmt(branch_id, query)
-        result = self.my.exec(stmt).first()
+        result = self.my.execute(stmt).first()
         if result is None:
             return None
         return self.__to_details(result) 
