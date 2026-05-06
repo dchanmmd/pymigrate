@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     PG_PASSWORD: str
     PG_NAME: str
 
+    JWT_ACCESS_SECRET: str
+    JWT_REFRESH_SECRET: str
+
     @computed_field
     @property
     def pg_url(self) -> str:

@@ -22,7 +22,7 @@ def search_barcode(
 ):
     details = service.get_by_barcode(branch_id, query.strip())
     if details is None:
-        raise HTTPException(404, 'No se encontraron registros para este código de barra')
+        raise HTTPException(404, detail='No se encontraron registros para este código de barra')
     return ItemResponse(success=True, message='Se obtuvo el registro con éxito', data=details)
 
 @router.get('/{branch_id}/{barcode}', response_model=ItemResponse[InventoryDetails])
@@ -33,6 +33,6 @@ def by_barcode(
 ):
     details = service.get_by_barcode(branch_id, barcode)
     if details is None:
-        raise HTTPException(404, 'No se encontraron registros para este código de barra')
+        raise HTTPException(404, detail='No se encontraron registros para este código de barra')
     return ItemResponse(success=True, message='Se obtuvo el registro con éxito', data=details)
 

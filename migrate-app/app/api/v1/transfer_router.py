@@ -19,28 +19,19 @@ router = APIRouter(prefix='/transfers')
 
 @router.get('/', response_model=ListResponse[JobSummary])
 def check_job_list(service: RequiresTransferService):
-    try: 
-        job_list = service.get_job_list()
-        return ListResponse(success=True, message='Se obtuvo el reporte del trabajo con éxito.', data=job_list)
-    except NotFoundError as e:
-        raise HTTPException(404, detail=str(e))
-    except FailedOperationError as e:
-        raise HTTPException(500, detail=str(e))
+    job_list = service.get_list()
+    if not job_list:
+        raise HTTPException(404, 'No se encontraron los trabajos.')
+    return ListResponse(success=True, message='Se obtuvo el reporte del trabajo con éxito.', data=job_list)
 
 @router.post('/', status_code=202, response_model=ItemResponse[str])
 def create_transfer_job(data: TransferRequest, service: RequiresTransferService):
-    try: 
-        job_id = service.save(data.row_ids)
-        return ItemResponse[str](success=True, message="El trabajo fue creado exitosamente.", data=job_id)
-    except RuntimeError as e:
-        raise HTTPException(500, detail=str(e))
+    job_id = service.save(data.row_ids)
+    return ItemResponse[str](success=True, message="El trabajo fue creado exitosamente.", data=job_id)
 
 @router.get('/{job_id}', response_model=ItemResponse[JobSummary])
 def check_job_status(job_id: str, service: RequiresTransferService):
-    try: 
-        summary = service.get_by_id(job_id)
-        return ItemResponse(success=True, message='Se obtuvo el reporte del trabajo con éxito.', data=summary)
-    except NotFoundError as e:
-        raise HTTPException(404, detail=str(e))
-    except FailedOperationError as e:
-        raise HTTPException(500, detail=str(e))
+    summary = service.get_by_id(job_id)
+    if summary is None:
+        raise HTTPException(404, 'No se encontró este trabajo.')
+    return ItemResponse(success=True, message='Se obtuvo el reporte del trabajo con éxito.', data=summary)
