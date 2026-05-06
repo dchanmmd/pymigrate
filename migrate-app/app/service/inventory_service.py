@@ -13,10 +13,11 @@ from app.model.carat_rating import CaratRating as CR
 class InventoryService:
     my: Session
 
-    def __init__(self, my: Session):
-        self.my = my
+    def __init__(cls, my: Session):
+        cls.my = my
 
-    def __stmt(self, branch_id: str, barcode: Optional[str] = None):
+    @staticmethod
+    def __stmt(branch_id: str, barcode: Optional[str] = None):
         conditions = [c for c in [
             IE.cantidad >= 1,
             Br.id.in_([826, 832, 840, 841, 852, 857, 869, 876, 885, 888, 891]),
@@ -49,7 +50,8 @@ class InventoryService:
             .order_by(IE.id_entrada_inventario.desc())
         )
     
-    def __details_resolve_name(self, row: Row) -> str | None:
+    @staticmethod
+    def __details_resolve_name(row: Row) -> str | None:
         description = row.description
         carat_rating = row.carat_rating
         weight = row.weight
@@ -81,12 +83,12 @@ class InventoryService:
     def __details_resolve_branch(branch: Optional[str]) -> str:
         return '' if not branch else ' '.join(branch.replace('MASMEDAN', '').split())
     
-
-    def __to_details(self, row: Row) -> InventoryDetails:
+    @classmethod
+    def __to_details(cls, row: Row) -> InventoryDetails:
         return InventoryDetails(
             internal_ref=row.barcode,
             barcode=row.barcode,
-            name=self.__details_resolve_name(row),
+            name=cls.__details_resolve_name(row),
             description=row.description,
             uom='Unidades',
             purchase_uom='Unidades',
@@ -106,13 +108,13 @@ class InventoryService:
             brand=row.brand,
             model=row.model,
             series=row.series,
-            branch=self.__details_resolve_branch(row.branch),
-            product_category=self.__details_resolve_category(row),
+            branch=cls.__details_resolve_branch(row.branch),
+            product_category=cls.__details_resolve_category(row),
         )
       
-    def get_by_barcode(self, branch_id: str, query: str) -> InventoryDetails | None:
-        stmt = self.__stmt(branch_id, query)
-        result = self.my.execute(stmt).first()
+    def get_by_barcode(cls, branch_id: str, query: str) -> InventoryDetails | None:
+        stmt = cls.__stmt(branch_id, query)
+        result = cls.my.execute(stmt).first()
         if result is None:
             return None
-        return self.__to_details(result) 
+        return cls.__to_details(result) 

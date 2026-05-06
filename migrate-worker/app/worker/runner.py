@@ -5,7 +5,7 @@ from app.repository.transfer_job_repository import TransferJobRepository
 from collections import defaultdict
 
 def run():
-    batch_limit = env.BATCH_LIMIT or 10
+    batch_limit = env.BATCH_LIMIT
 
     while True:
         with get_pg_session() as pg:
@@ -30,7 +30,7 @@ def run():
                     job_items = items_by_job[job.job_id]
                     job_items # work()
             except Exception:
-                job_repo.mark_failed_or_retry(job_ids)
+                # retry_or_fail()
                 raise
 
             if len(jobs) < batch_limit:
